@@ -1,0 +1,921 @@
+/* ============================================
+   DASHBOARD - Japanese Modern Style
+   Matches Products Page Aesthetic
+   Minimal Icons, Clean Typography, Refined
+   ============================================ */
+
+:root {
+    /* Japanese-inspired Color Palette (Same as Products) */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    --blue: #6b8fa3;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    
+    /* Spacing */
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 64px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--ink);
+}
+
+/* Page Title (Minimal) */
+.page-title-jp {
+    background: var(--paper);
+    border-bottom: 1px solid var(--sand);
+    padding: 32px 0;
+    margin-top: 84px; /* Offset for fixed nav */
+}
+
+.title-content-jp {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-heading-jp {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+}
+
+.page-breadcrumb-jp {
+    font-size: 13px;
+    color: var(--ash);
+    letter-spacing: 0.5px;
+    margin-right: 57px;
+}
+
+/* ============================================
+   DASHBOARD SECTION
+   ============================================ */
+
+.dashboard-section-medium {
+    padding: var(--space-xl) 0;
+    background: var(--cream);
+}
+
+.container-medium {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 60px;
+}
+
+/* ============================================
+   SIDEBAR NAVIGATION (Same as Products)
+   ============================================ */
+
+.dashboard-sidebar-medium {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.nav-card-medium {
+    background: var(--paper);
+    padding: var(--space-md);
+    border: 1px solid var(--sand);
+    margin-bottom: var(--space-md);
+    box-shadow: var(--shadow-xs);
+}
+
+.nav-card-medium h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--charcoal);
+    margin: 0 0 20px;
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--sand);
+}
+
+/* Navigation Divider (Same as Products) */
+.nav-divider-jp {
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    margin-bottom: var(--space-md);
+}
+
+.nav-list-medium {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item-medium {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+}
+
+.nav-item-medium:hover {
+    background: var(--cream);
+    color: var(--copper);
+    padding-left: 16px;
+}
+
+.nav-item-medium.active {
+    background: var(--cream);
+    color: var(--copper);
+    font-weight: 500;
+    border-left-color: var(--copper);
+}
+
+/* Navigation Dot (Same as Products) */
+.nav-dot-jp {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--mist);
+    transition: all 0.3s ease;
+}
+
+.nav-item-medium:hover .nav-dot-jp,
+.nav-item-medium.active .nav-dot-jp {
+    background: var(--gold);
+    transform: scale(1.5);
+}
+
+/* REMOVE ICONS - Use dots instead */
+.nav-icon {
+    display: none;
+}
+
+.logout-card-medium {
+    background: var(--paper);
+    padding: var(--space-sm);
+    border: 1px solid var(--sand);
+    box-shadow: var(--shadow-xs);
+}
+
+.btn-logout-medium {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--sand);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-logout-medium:hover {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+}
+
+.btn-logout-medium svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.5;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+
+.dashboard-main-medium {
+    background: var(--paper);
+    border: 1px solid var(--sand);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-xs);
+}
+
+.content-panel-medium {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.content-panel-medium.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.panel-title-medium {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--sand);
+    letter-spacing: -0.3px;
+}
+
+.panel-header-medium {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.panel-header-medium .panel-title-medium {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.btn-link-medium {
+    color: var(--copper);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.btn-link-medium:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+}
+
+.section-title-medium {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: var(--space-lg) 0 var(--space-md);
+    letter-spacing: 0.2px;
+}
+
+/* ============================================
+   STATS GRID (Minimal - No Icons)
+   ============================================ */
+
+.stats-grid-medium {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.stat-card-medium {
+    padding: var(--space-md);
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    border-left: 3px solid var(--copper);
+    transition: all 0.3s ease;
+}
+
+.stat-card-medium:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* REMOVE ICONS */
+.stat-icon-medium {
+    display: none;
+}
+
+.stat-info {
+    width: 100%;
+}
+
+.stat-value-medium {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 var(--space-xs);
+}
+
+.stat-label-medium {
+    font-size: 11px;
+    color: var(--ash);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* ============================================
+   ORDERS LIST (Clean - No Icons)
+   ============================================ */
+
+.orders-list-medium {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.order-card-medium {
+    padding: var(--space-md);
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    transition: all 0.3s ease;
+}
+
+.order-card-medium:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.order-header-medium {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--sand);
+}
+
+.order-number-medium {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    display: block;
+    font-family: 'Courier New', monospace;
+}
+
+.order-date-medium {
+    display: block;
+    font-size: 12px;
+    color: var(--ash);
+    margin-top: 4px;
+}
+
+.order-details-medium {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-items-medium {
+    font-size: 13px;
+    color: var(--charcoal);
+}
+
+.order-amount-medium {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--copper);
+}
+
+.status-badge-medium {
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge-medium.status-P { background: rgba(184, 147, 90, 0.1); color: var(--copper); }
+.status-badge-medium.status-C { background: rgba(122, 148, 121, 0.1); color: var(--green); }
+.status-badge-medium.status-S { background: rgba(107, 143, 163, 0.1); color: var(--blue); }
+.status-badge-medium.status-D { background: rgba(122, 148, 121, 0.15); color: var(--green); }
+.status-badge-medium.status-X { background: rgba(185, 92, 92, 0.1); color: var(--red); }
+
+.order-link-medium {
+    font-size: 13px;
+    color: var(--copper);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.order-link-medium:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+}
+
+/* ============================================
+   ADDRESS GRID (Clean - Minimal Icons)
+   ============================================ */
+
+.address-grid-medium {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+}
+
+.address-card-dash {
+    padding: var(--space-md);
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    transition: all 0.3s ease;
+}
+
+.address-card-dash.is-default {
+    border-left: 3px solid var(--copper);
+    background: var(--paper);
+}
+
+.address-card-dash:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.addr-header-dash {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--sand);
+}
+
+.addr-label-dash {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+}
+
+/* REMOVE ICONS - Show label only */
+.addr-label-dash::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--copper);
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.badge-default-dash {
+    padding: 3px 10px;
+    background: var(--copper);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.addr-body-dash {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.addr-name-dash {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0;
+}
+
+.addr-text-dash,
+.addr-phone-dash {
+    font-size: 13px;
+    color: var(--ash);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.addr-phone-dash {
+    color: var(--copper);
+    font-weight: 500;
+}
+
+/* ============================================
+   FORMS (Minimal)
+   ============================================ */
+
+.form-medium {
+    max-width: 680px;
+}
+
+.form-row-medium {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    margin-top : var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.form-group-medium {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.form-group-medium label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group-medium input,
+.form-group-medium select {
+    padding: 12px var(--space-sm);
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    font-size: 14px;
+    font-family: var(--font-primary);
+    background: white;
+    color: var(--ink);
+    transition: all 0.3s ease;
+}
+
+.form-group-medium input:focus,
+.form-group-medium select:focus {
+    outline: none;
+    border-color: var(--copper);
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
+}
+
+.form-group-medium input:disabled {
+    background: var(--cream);
+    color: var(--ash);
+    cursor: not-allowed;
+}
+
+.btn-submit-medium {
+    padding: 12px 28px;
+    background: var(--copper);
+    color: white;
+    border: none;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-submit-medium:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-submit-medium:disabled {
+    background: var(--mist);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   LOYALTY CARD (Minimal - No Icons)
+   ============================================ */
+
+.loyalty-card-medium {
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, var(--ink) 0%, var(--charcoal) 100%);
+    color: white;
+    max-width: 520px;
+    border: 1px solid var(--sand);
+}
+
+.loyalty-header-medium {
+    text-align: center;
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.loyalty-points-large {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 500;
+    color: var(--gold);
+    margin-bottom: var(--space-xs);
+}
+
+.loyalty-value-medium {
+    font-size: 13px;
+    opacity: 0.85;
+    letter-spacing: 0.3px;
+}
+
+.loyalty-rules-medium {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.rule-item-medium {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: var(--space-sm);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Simple text indicators instead of icons */
+.rule-icon-medium {
+    width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    flex-shrink: 0;
+}
+
+.rule-title-medium {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 4px;
+}
+
+.rule-text-medium {
+    font-size: 13px;
+    opacity: 0.85;
+    margin: 0;
+}
+
+.btn-loyalty-medium {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--copper);
+    color: white;
+    border: none;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-loyalty-medium:hover {
+    background: var(--gold);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   EMPTY STATE (Clean - Minimal Icon)
+   ============================================ */
+
+.empty-state-medium {
+    text-align: center;
+    padding: var(--space-xl) var(--space-lg);
+    background: var(--cream);
+}
+
+/* Simple dot instead of large icon */
+.empty-icon-medium {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--sand);
+    border-radius: 50%;
+    margin: 0 auto var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon-medium::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: var(--mist);
+    border-radius: 50%;
+}
+
+.empty-state-medium p {
+    font-size: 14px;
+    color: var(--charcoal);
+    margin: 0 0 var(--space-md);
+}
+
+.empty-state-medium a {
+    color: var(--copper);
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.empty-state-medium a:hover {
+    border-bottom-color: var(--copper);
+}
+
+.btn-empty-medium {
+    display: inline-block;
+    padding: 10px 24px;
+    background: var(--copper);
+    color: white !important ;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-empty-medium:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS (Same as Products)
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px var(--space-sm);
+    background: white;
+    border: 1px solid var(--sand);
+    box-shadow: var(--shadow-md);
+    min-width: 320px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.toast-success {
+    border-left: 3px solid var(--green);
+}
+
+.toast.toast-error {
+    border-left: 3px solid var(--red);
+}
+
+.toast svg {
+    flex-shrink: 0;
+    stroke-width: 1.5;
+}
+
+.toast span {
+    font-size: 13px;
+    color: var(--ink);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .container-medium {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .dashboard-sidebar-medium {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 240px;
+        gap: var(--space-md);
+    }
+    
+    .nav-card-medium {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-hero-medium {
+        margin-top: 72px;
+    }
+    
+    .hero-content-medium h1 {
+        font-size: 26px;
+    }
+    
+    .dashboard-sidebar-medium {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid-medium {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row-medium {
+        grid-template-columns: 1fr;
+    }
+    
+    .address-grid-medium {
+        grid-template-columns: 1fr;
+    }
+    
+    .loyalty-rules-medium {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content-medium h1 {
+        font-size: 22px;
+    }
+    
+    .container-medium {
+        padding: 0 var(--space-sm);
+    }
+    
+    .dashboard-main-medium {
+        padding: var(--space-md);
+    }
+    
+    .loyalty-points-large {
+        font-size: 42px;
+    }
+}
+
+/* Ensure panels are properly stacked */
+.content-panel-medium {
+    position: relative;
+    z-index: 1;
+}
+
+/* Make sure nothing is covering the content */
+.dashboard-main-medium {
+    position: relative;
+    z-index: 2;
+}
+
+/* Ensure buttons and links are clickable */
+.nav-item-medium,
+.btn-submit-medium,
+.order-link-medium,
+.btn-logout-medium {
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Make sure form inputs are accessible */
+.form-group-medium input,
+.form-group-medium select {
+    position: relative;
+    z-index: 5;
+}

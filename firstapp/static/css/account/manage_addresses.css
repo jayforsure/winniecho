@@ -1,0 +1,752 @@
+/* ============================================
+   MANAGE ADDRESSES - Japanese Modern Style
+   Matches Products Page Aesthetic
+   ============================================ */
+
+:root {
+    /* Japanese-inspired Color Palette (Same as Products) */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Page Title (Minimal) */
+.page-title-jp {
+    background: var(--paper);
+    border-bottom: 1px solid var(--sand);
+    padding: 32px 0;
+    margin-top: 84px; /* Offset for fixed nav */
+}
+
+.title-content-jp {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-heading-jp {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    margin-left: 25px;
+}
+
+.page-breadcrumb-jp {
+    font-size: 13px;
+    color: var(--ash);
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+}
+
+.container-medium {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 60px;
+}
+
+/* ============================================
+   MAIN SECTION
+   ============================================ */
+
+.addresses-section-modern {
+    padding: 64px 0;
+    background: var(--cream);
+    min-height: calc(100vh - 400px);
+}
+
+.container-modern {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ============================================
+   SECTION HEADER
+   ============================================ */
+
+.section-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--sand);
+}
+
+.header-info h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+}
+
+.address-count {
+    font-size: 12px;
+    color: var(--ash);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-add-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: var(--copper);
+    color: white;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-add-modern:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-add-modern svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+/* ============================================
+   ADDRESSES GRID
+   ============================================ */
+
+.addresses-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+/* ============================================
+   ADDRESS CARD (Clean - Minimal Icons)
+   ============================================ */
+
+.address-card-modern {
+    background: var(--paper);
+    border: 1px solid var(--sand);
+    padding: 24px;
+    transition: all 0.3s ease;
+}
+
+.address-card-modern.is-default {
+    border-left: 3px solid var(--copper);
+    background: white;
+}
+
+.address-card-modern:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Card Header */
+.card-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--sand);
+}
+
+.label-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+/* REMOVE EMOJI ICONS - Use simple dot */
+.label-icon {
+    display: none;
+}
+
+.label-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    position: relative;
+    padding-left: 12px;
+}
+
+/* Add dot before label (like products navigation) */
+.label-text::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--copper);
+    border-radius: 50%;
+}
+
+.badge-default {
+    padding: 3px 10px;
+    background: var(--copper);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Card Body */
+.card-body-modern {
+    margin-bottom: 16px;
+}
+
+.addr-name-modern {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 12px;
+}
+
+.addr-line-modern,
+.addr-city-modern,
+.addr-postal-modern,
+.addr-phone-modern {
+    font-size: 13px;
+    color: var(--charcoal);
+    margin: 0 0 6px;
+    line-height: 1.6;
+}
+
+.addr-phone-modern {
+    color: var(--copper);
+    font-weight: 500;
+}
+
+/* Card Actions */
+.card-actions-modern {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--sand);
+}
+
+.btn-action-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--sand);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action-modern svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 2;
+}
+
+.btn-default-modern:hover {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.btn-edit-modern:hover {
+    background: var(--copper);
+    color: white;
+    border-color: var(--copper);
+}
+
+.btn-delete-modern:hover {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+}
+
+/* ============================================
+   EMPTY STATE (Minimal)
+   ============================================ */
+
+.empty-state-modern {
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--paper);
+    border: 1px solid var(--sand);
+}
+
+/* Simple dot instead of emoji */
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    border: 2px solid var(--sand);
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+}
+
+.empty-icon::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: var(--mist);
+    border-radius: 50%;
+}
+
+.empty-state-modern h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 12px;
+    letter-spacing: -0.3px;
+}
+
+.empty-state-modern p {
+    font-size: 14px;
+    color: var(--ash);
+    margin: 0 0 32px;
+}
+
+.btn-empty-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: var(--copper);
+    color: white;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-empty-modern:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+}
+
+.btn-empty-modern svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ============================================
+   BACK LINK
+   ============================================ */
+
+.back-link-modern {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.back-link-modern a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--charcoal);
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.back-link-modern a:hover {
+    color: var(--copper);
+    border-bottom-color: var(--copper);
+}
+
+.back-link-modern svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ============================================
+   MODAL (Minimal)
+   ============================================ */
+
+.modal-modern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-modern.active {
+    display: flex;
+}
+
+.modal-overlay-modern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(43, 43, 43, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content-modern {
+    position: relative;
+    z-index: 10;
+    background: var(--paper);
+    max-width: 650px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Header */
+.modal-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--sand);
+}
+
+.modal-header-modern h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.modal-close-modern {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close-modern:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+}
+
+.modal-close-modern svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   FORM (Minimal)
+   ============================================ */
+
+.form-modern {
+    padding: 28px;
+}
+
+.form-group-modern {
+    margin-bottom: 20px;
+}
+
+.form-group-modern label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group-modern input,
+.form-group-modern select,
+.form-group-modern textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    font-size: 14px;
+    font-family: var(--font-primary);
+    background: white;
+    color: var(--ink);
+    transition: all 0.3s ease;
+}
+
+.form-group-modern input:focus,
+.form-group-modern select:focus,
+.form-group-modern textarea:focus {
+    outline: none;
+    border-color: var(--copper);
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
+}
+
+.form-group-modern textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group-modern select {
+    cursor: pointer;
+}
+
+.form-row-modern {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Form Checkbox */
+.form-checkbox-modern {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.form-checkbox-modern input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--copper);
+}
+
+.form-checkbox-modern label {
+    font-size: 13px;
+    color: var(--charcoal);
+    cursor: pointer;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* Form Actions */
+.form-actions-modern {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-cancel-modern,
+.btn-submit-modern {
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-modern {
+    background: transparent;
+    border: 1px solid var(--sand);
+    color: var(--charcoal);
+}
+
+.btn-cancel-modern:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+}
+
+.btn-submit-modern {
+    background: var(--copper);
+    border: none;
+    color: white;
+}
+
+.btn-submit-modern:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+}
+
+.btn-submit-modern:disabled {
+    background: var(--mist);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS (Same as Products)
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--sand);
+    box-shadow: var(--shadow-md);
+    min-width: 320px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.toast-success {
+    border-left: 3px solid var(--green);
+}
+
+.toast.toast-error {
+    border-left: 3px solid var(--red);
+}
+
+.toast svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.toast span {
+    font-size: 13px;
+    color: var(--ink);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .addresses-hero-modern {
+        margin-top: 72px;
+    }
+    
+    .hero-content-modern h1 {
+        font-size: 26px;
+    }
+    
+    .section-header-modern {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .btn-add-modern {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .addresses-grid-modern {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row-modern {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content-modern {
+        width: 95%;
+    }
+    
+    .form-actions-modern {
+        flex-direction: column-reverse;
+    }
+    
+    .btn-cancel-modern,
+    .btn-submit-modern {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content-modern h1 {
+        font-size: 22px;
+    }
+    
+    .addresses-section-modern {
+        padding: 40px 0;
+    }
+    
+    .container-modern {
+        padding: 0 16px;
+    }
+    
+    .card-actions-modern {
+        flex-direction: column;
+    }
+    
+    .btn-action-modern {
+        width: 100%;
+        justify-content: center;
+    }
+}

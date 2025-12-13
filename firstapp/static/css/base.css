@@ -1,0 +1,553 @@
+/* ============================================
+   JAPANESE MODERN BASE STYLES
+   WinnieCho Chocolate Ordering System
+   ============================================ */
+
+:root {
+    /* Japanese-inspired Color Palette */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    
+    /* Transitions */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   NAVIGATION (Minimalist)
+   ============================================ */
+.nav-jp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(250, 250, 248, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--sand);
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.nav-container-jp {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 84px;
+}
+
+/* Logo (Refined) */
+.nav-logo-jp {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    gap: 2px;
+}
+
+.logo-main {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: var(--ink);
+    font-family: var(--font-primary);
+}
+
+.logo-sub {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ash);
+    font-weight: 300;
+}
+
+.nav-logo-jp:hover .logo-main {
+    color: var(--copper);
+}
+
+/* Nav Menu */
+.nav-menu-jp {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+}
+
+.nav-link-jp {
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: var(--transition);
+    position: relative;
+    font-weight: 400;
+}
+
+.nav-link-jp::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.3s ease;
+}
+
+.nav-link-jp:hover,
+.nav-link-jp.active {
+    color: var(--copper);
+}
+
+.nav-link-jp:hover::after,
+.nav-link-jp.active::after {
+    width: 100%;
+}
+
+/* Nav Actions */
+.nav-actions-jp {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.nav-icon-jp {
+    position: relative;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon-jp:hover {
+    color: var(--copper);
+}
+
+.cart-badge-jp {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: none;
+    min-width: 18px;
+    text-align: center;
+}
+
+.nav-user-jp {
+    font-size: 13px;
+    color: var(--charcoal);
+    letter-spacing: 0.5px;
+}
+
+.nav-btn-jp {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 10px 20px;
+    border: 1px solid var(--sand);
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.nav-btn-jp:hover {
+    border-color: var(--gold);
+    color: var(--copper);
+}
+
+.nav-btn-jp.primary {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+}
+
+.nav-btn-jp.primary:hover {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+}
+
+.nav-btn-jp.logout {
+    border-color: transparent;
+    padding: 10px 16px;
+}
+
+/* Mobile Toggle */
+.mobile-toggle-jp {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.mobile-toggle-jp span {
+    width: 24px;
+    height: 1px;
+    background: var(--ink);
+    transition: var(--transition);
+}
+
+/* ============================================
+   MESSAGES (Minimalist)
+   ============================================ */
+.messages-jp {
+    position: fixed;
+    top: 104px;
+    right: 32px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+}
+
+.message-jp {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--paper);
+    border: 1px solid var(--sand);
+    box-shadow: var(--shadow-md);
+    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.message-content-jp {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.message-dot-jp {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.message-success .message-dot-jp {
+    background: var(--green);
+}
+
+.message-error .message-dot-jp {
+    background: var(--red);
+}
+
+.message-warning .message-dot-jp {
+    background: #e8a55c;
+}
+
+.message-info .message-dot-jp {
+    background: #6b8db8;
+}
+
+.message-jp span {
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0.2px;
+}
+
+.message-close-jp {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--ash);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: var(--transition);
+    line-height: 1;
+    padding: 0;
+}
+
+.message-close-jp:hover {
+    opacity: 1;
+    color: var(--charcoal);
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+main {
+    margin-top: 84px;
+    min-height: calc(100vh - 84px);
+}
+
+/* ============================================
+   FOOTER (Minimalist)
+   ============================================ */
+.footer-jp {
+    background: var(--paper);
+    border-top: 1px solid var(--sand);
+    padding: 64px 0 32px;
+    margin-top: 80px;
+}
+
+.footer-container-jp {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+.footer-grid-jp {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 64px;
+    margin-bottom: 48px;
+}
+
+.footer-col-jp {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Brand Column */
+.footer-brand-jp {
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.footer-tagline-jp {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--ash);
+    margin-bottom: 16px;
+}
+
+.footer-text-jp {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--charcoal);
+    letter-spacing: 0.2px;
+}
+
+.footer-year-jp {
+    font-size: 12px;
+    color: var(--ash);
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+}
+
+/* Other Columns */
+.footer-title-jp {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+}
+
+.footer-divider-jp {
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    margin-bottom: 8px;
+}
+
+.footer-link-jp {
+    font-size: 14px;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: var(--transition);
+    letter-spacing: 0.2px;
+}
+
+.footer-link-jp:hover {
+    color: var(--copper);
+    padding-left: 4px;
+}
+
+/* Footer Bottom */
+.footer-bottom-jp {
+    padding-top: 32px;
+    border-top: 1px solid var(--sand);
+    text-align: center;
+}
+
+.footer-bottom-jp p {
+    font-size: 12px;
+    color: var(--ash);
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+    .footer-grid-jp {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container-jp {
+        height: 72px;
+        padding: 0 20px;
+    }
+    
+    .nav-menu-jp {
+        display: none;
+    }
+    
+    .mobile-toggle-jp {
+        display: flex;
+    }
+    
+    .nav-actions-jp {
+        gap: 16px;
+    }
+    
+    .nav-user-jp {
+        display: none;
+    }
+    
+    .messages-jp {
+        right: 16px;
+        left: 16px;
+        max-width: none;
+    }
+    
+    .footer-grid-jp {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    
+    main {
+        margin-top: 72px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-container-jp {
+        padding: 0 16px;
+    }
+    
+    .logo-main {
+        font-size: 14px;
+    }
+    
+    .logo-sub {
+        font-size: 9px;
+    }
+    
+    .nav-btn-jp {
+        font-size: 11px;
+        padding: 8px 16px;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Spacing Utilities */
+.mt-sm { margin-top: 16px; }
+.mt-md { margin-top: 24px; }
+.mt-lg { margin-top: 40px; }
+.mt-xl { margin-top: 64px; }
+
+.mb-sm { margin-bottom: 16px; }
+.mb-md { margin-bottom: 24px; }
+.mb-lg { margin-bottom: 40px; }
+.mb-xl { margin-bottom: 64px; }
+
+.pt-sm { padding-top: 16px; }
+.pt-md { padding-top: 24px; }
+.pt-lg { padding-top: 40px; }
+.pt-xl { padding-top: 64px; }
+
+.pb-sm { padding-bottom: 16px; }
+.pb-md { padding-bottom: 24px; }
+.pb-lg { padding-bottom: 40px; }
+.pb-xl { padding-bottom: 64px; }
+
+/* ============================================
+   OVERRIDES FOR AI CHAT
+   ============================================ */
+body:has(.ai-chat-section) main {
+    margin-top: 0;
+}
+
+body:has(.ai-chat-section) .footer-jp {
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    body:has(.ai-chat-section) main {
+        margin-top: 0;
+    }
+}

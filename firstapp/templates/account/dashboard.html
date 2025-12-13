@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - WinnieCho{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Page Title (Minimal) -->
+<div class="page-title-jp">
+    <div class="container-medium">
+        <div class="title-content-jp">
+            <h1 class="page-heading-jp">Account</h1>
+            <p class="page-breadcrumb-jp">Home /<br> Account</p>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Section -->
+<section class="dashboard-section-medium">
+    <div class="container-medium">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar-medium">
+            <div class="nav-card-medium">
+                <h3>Menu</h3>
+                <div class="nav-divider-jp"></div>
+                <div class="nav-list-medium">
+                    <a href="#overview" class="nav-item-medium active">
+                        <span class="nav-dot-jp"></span>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#profile" class="nav-item-medium">
+                        <span class="nav-dot-jp"></span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#orders" class="nav-item-medium">
+                        <span class="nav-dot-jp"></span>
+                        <span>Orders</span>
+                    </a>
+                    <a href="#address" class="nav-item-medium">
+                        <span class="nav-dot-jp"></span>
+                        <span>Addresses</span>
+                    </a>
+                    {% if member %}
+                    <a href="#loyalty" class="nav-item-medium">
+                        <span class="nav-dot-jp"></span>
+                        <span>Loyalty</span>
+                    </a>
+                    {% endif %}
+                    <a href="#password" class="nav-item-medium">
+                        <span class="nav-dot-jp"></span>
+                        <span>Security</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="logout-card-medium">
+                <a href="{% url 'logout' %}" class="btn-logout-medium">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <div class="dashboard-main-medium">
+            <!-- Overview Panel -->
+            <div class="content-panel-medium active" id="overview">
+                <h2 class="panel-title-medium">Overview</h2>
+                
+                <!-- Stats Grid (No Icons) -->
+                <div class="stats-grid-medium">
+                    <div class="stat-card-medium">
+                        <div class="stat-info">
+                            <p class="stat-value-medium">{{ total_orders }}</p>
+                            <p class="stat-label-medium">Total Orders</p>
+                        </div>
+                    </div>
+                    {% if member %}
+                    <div class="stat-card-medium">
+                        <div class="stat-info">
+                            <p class="stat-value-medium">{{ member.loyalty_points|floatformat:1 }}</p>
+                            <p class="stat-label-medium">Loyalty Points</p>
+                        </div>
+                    </div>
+                    <div class="stat-card-medium">
+                        <div class="stat-info">
+                            <p class="stat-value-medium">RM {{ member.total_spent|floatformat:0 }}</p>
+                            <p class="stat-label-medium">Total Spent</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Recent Orders -->
+                <h3 class="section-title-medium">Recent Orders</h3>
+                {% if recent_orders %}
+                <div class="orders-list-medium">
+                    {% for order in recent_orders %}
+                    <div class="order-card-medium">
+                        <div class="order-header-medium">
+                            <div>
+                                <span class="order-number-medium">#{{ order.order_number }}</span>
+                                <span class="order-date-medium">{{ order.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <span class="status-badge-medium status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </div>
+                        <div class="order-details-medium">
+                            <span class="order-items-medium">{{ order.get_total_items }} items</span>
+                            <span class="order-amount-medium">RM {{ order.subtotal|floatformat:2 }}</span>
+                        </div>
+                        <a href="{% url 'order_detail' order.id %}" class="order-link-medium">View Receipt →</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state-medium">
+                    <div class="empty-icon-medium"></div>
+                    <p>No orders yet. <a href="{% url 'products' %}">Start shopping!</a></p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Profile Panel -->
+            <div class="content-panel-medium" id="profile">
+                <h2 class="panel-title-medium">Profile Settings</h2>
+                
+                <form id="profileForm" class="form-medium">
+                    {% csrf_token %}
+                    <div class="form-row-medium">
+                        <div class="form-group-medium">
+                            <label>Full Name</label>
+                            <input type="text" name="name" value="{{ user.name }}" required>
+                        </div>
+                        <div class="form-group-medium">
+                            <label>Email Address</label>
+                            <input type="email" value="{{ user.email }}" disabled>
+                        </div>
+                    </div>
+                    <div class="form-row-medium">
+                        <div class="form-group-medium">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" value="{{ user.phone }}" required>
+                        </div>
+                        <div class="form-group-medium">
+                            <label>Birthday</label>
+                            <input type="date" name="birthday" value="{{ user.birthday|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit-medium">Update Profile</button>
+                </form>
+            </div>
+
+            <!-- Orders Panel -->
+            <div class="content-panel-medium" id="orders">
+                <h2 class="panel-title-medium">Order History</h2>
+                
+                {% if orders %}
+                <div class="orders-list-medium">
+                    {% for order in orders %}
+                    <div class="order-card-medium">
+                        <div class="order-header-medium">
+                            <div>
+                                <span class="order-number-medium">#{{ order.order_number }}</span>
+                                <span class="order-date-medium">{{ order.created_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <span class="status-badge-medium status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </div>
+                        <div class="order-details-medium">
+                            <span class="order-items-medium">{{ order.get_total_items }} items</span>
+                            <span class="order-amount-medium">RM {{ order.subtotal|floatformat:2 }}</span>
+                        </div>
+                        <a href="{% url 'order_detail' order.id %}" class="order-link-medium">View Receipt →</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state-medium">
+                    <div class="empty-icon-medium"></div>
+                    <p>No orders yet</p>
+                    <a href="{% url 'products' %}" class="btn-empty-medium">Shop Now</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Address Panel -->
+            <div class="content-panel-medium" id="address">
+                <div class="panel-header-medium">
+                    <h2 class="panel-title-medium">Delivery Addresses</h2>
+                    <a href="{% url 'manage_addresses' %}" class="btn-link-medium">Manage All →</a>
+                </div>
+                
+                {% if addresses %}
+                <div class="address-grid-medium">
+                    {% for addr in addresses|slice:":3" %}
+                    <div class="address-card-dash {% if addr.is_default %}is-default{% endif %}">
+                        <div class="addr-header-dash">
+                            <span class="addr-label-dash">{{ addr.label }}</span>
+                            {% if addr.is_default %}
+                            <span class="badge-default-dash">Default</span>
+                            {% endif %}
+                        </div>
+                        <div class="addr-body-dash">
+                            <p class="addr-name-dash">{{ addr.user.name }}</p>
+                            <p class="addr-text-dash">{{ addr.address }}</p>
+                            <p class="addr-text-dash">{{ addr.city }}, {{ addr.state }}</p>
+                            <p class="addr-phone-dash">{{ addr.user.phone }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state-medium">
+                    <div class="empty-icon-medium"></div>
+                    <p>No addresses saved</p>
+                    <a href="{% url 'manage_addresses' %}" class="btn-empty-medium">Add Address</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Loyalty Panel -->
+            {% if member %}
+            <div class="content-panel-medium" id="loyalty">
+                <h2 class="panel-title-medium">Loyalty Program</h2>
+                
+                <div class="loyalty-card-medium">
+                    <div class="loyalty-header-medium">
+                        <div class="loyalty-points-large">{{ member.loyalty_points|floatformat:2 }}</div>
+                        <div class="loyalty-value-medium">Worth RM {{ member.get_points_value|floatformat:2 }}</div>
+                    </div>
+                    
+                    <div class="loyalty-rules-medium">
+                        <div class="rule-item-medium">
+                            <div class="rule-icon-medium">+</div>
+                            <div>
+                                <p class="rule-title-medium">Earn Points</p>
+                                <p class="rule-text-medium">RM 1 spent = 0.01 pts</p>
+                            </div>
+                        </div>
+                        <div class="rule-item-medium">
+                            <div class="rule-icon-medium">−</div>
+                            <div>
+                                <p class="rule-title-medium">Redeem</p>
+                                <p class="rule-text-medium">1 pt = RM 0.50 off</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'products' %}" class="btn-loyalty-medium">Shop & Earn More</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Password Panel -->
+            <div class="content-panel-medium" id="password">
+                <h2 class="panel-title-medium">Change Password</h2>
+                
+                <form id="passwordForm" class="form-medium">
+                    {% csrf_token %}
+                    <div class="form-group-medium">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password" required>
+                    </div>
+                    <div class="form-row-medium">
+                        <div class="form-group-medium">
+                            <label>New Password</label>
+                            <input type="password" name="new_password" required minlength="8">
+                        </div>
+                        <div class="form-group-medium">
+                            <label>Confirm New Password</label>
+                            <input type="password" name="confirm_password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit-medium">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

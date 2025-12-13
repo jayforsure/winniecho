@@ -1,0 +1,725 @@
+/* ============================================
+   CHECKOUT - Japanese Modern Style
+   Minimalist, Elegant, Refined
+   ============================================ */
+
+:root {
+    /* Japanese-inspired Color Palette */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    
+    /* Spacing Scale */
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 64px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--ink);
+    line-height: 1.6;
+}
+
+/* ============================================
+   CHECKOUT WRAPPER
+   ============================================ */
+
+.checkout-wrapper {
+    background: var(--paper);
+    min-height: 100vh;
+    padding: var(--space-md) 0 var(--space-xl);
+}
+
+/* ============================================
+   PROGRESS STEPS (Minimalist)
+   ============================================ */
+
+.checkout-progress {
+    max-width: 1320px;
+    margin: 0 auto var(--space-lg);
+    padding: 0 var(--space-md);
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.step-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid var(--sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--mist);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-step.active .step-circle {
+    background: var(--copper);
+    border-color: var(--copper);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.progress-step.current .step-circle {
+    box-shadow: 0 0 0 4px rgba(166, 124, 82, 0.12);
+}
+
+.progress-step span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ash);
+    letter-spacing: 0.3px;
+}
+
+.progress-step.active span {
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.progress-line {
+    height: 1px;
+    width: 72px;
+    background: var(--sand);
+    position: relative;
+    top: -16px;
+}
+
+.progress-step.active + .progress-line {
+    background: var(--copper);
+}
+
+/* ============================================
+   MAIN CONTENT GRID
+   ============================================ */
+
+.checkout-content {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: var(--space-lg);
+    align-items: start;
+}
+
+/* ============================================
+   SECTION CARDS (Refined)
+   ============================================ */
+
+.section-card {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 2px;
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-xs);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 var(--space-lg);
+    letter-spacing: -0.3px;
+}
+
+/* ============================================
+   FORM SECTIONS
+   ============================================ */
+
+.form-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--sand);
+}
+
+.form-section:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.subsection-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 var(--space-md);
+    letter-spacing: 0.3px;
+}
+
+.subsection-title svg {
+    color: var(--copper);
+    stroke-width: 1.5;
+}
+
+/* ============================================
+   ADDRESS SELECTION (Japanese Cards)
+   ============================================ */
+
+.address-grid {
+    display: grid;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.address-card {
+    position: relative;
+    display: block;
+    padding: var(--space-md);
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.address-card:hover {
+    border-color: var(--copper);
+    transform: translateX(2px);
+}
+
+.address-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.address-card:has(input:checked) {
+    border-color: var(--copper);
+    border-width: 1px 1px 1px 3px;
+    background: white;
+}
+
+.address-card:has(input:checked) .address-content {
+    opacity: 1;
+}
+
+.address-card:has(input:checked) .check-indicator {
+    opacity: 1;
+}
+
+.address-content {
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.address-badges {
+    display: flex;
+    gap: var(--space-xs);
+    margin-bottom: 12px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 0;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.badge-primary {
+    background: var(--copper);
+    color: white;
+}
+
+.badge-secondary {
+    background: var(--sand);
+    color: var(--charcoal);
+}
+
+.address-info .name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 6px;
+    letter-spacing: 0.2px;
+}
+
+.address-info .details,
+.address-info .phone {
+    font-size: 13px;
+    color: var(--ash);
+    margin: 0 0 4px;
+    line-height: 1.5;
+}
+
+.check-indicator {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--copper);
+    background: var(--copper);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* ============================================
+   LOYALTY POINTS (Elegant Card)
+   ============================================ */
+
+.loyalty-card {
+    background: linear-gradient(135deg, var(--cream) 0%, white 100%);
+    border: 1px solid var(--sand);
+    padding: var(--space-md);
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.loyalty-info {
+    flex: 1;
+}
+
+.points-display {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-bottom: 6px;
+}
+
+.points-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--copper);
+    letter-spacing: -0.5px;
+}
+
+.points-label {
+    font-size: 13px;
+    color: var(--ash);
+    letter-spacing: 0.3px;
+}
+
+.points-worth {
+    font-size: 13px;
+    color: var(--charcoal);
+}
+
+.loyalty-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-field {
+    padding: 12px 16px;
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--ink);
+    background: white;
+    transition: all 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--copper);
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
+}
+
+.input-field::placeholder {
+    color: var(--mist);
+}
+
+.input-note {
+    font-size: 11px;
+    color: var(--ash);
+    letter-spacing: 0.2px;
+}
+
+/* ============================================
+   BUTTONS & LINKS (Japanese Aesthetic)
+   ============================================ */
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-md);
+    margin-top: var(--space-md);
+    border-top: 1px solid var(--sand);
+}
+
+.btn-primary {
+    padding: 14px 32px;
+    background: var(--copper);
+    color: white;
+    border: none;
+    border-radius: 0;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background: var(--mist);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-text {
+    color: var(--charcoal);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: color 0.3s;
+}
+
+.btn-text:hover {
+    color: var(--copper);
+}
+
+.link-button {
+    display: inline-block;
+    color: var(--copper);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: color 0.3s;
+    border-bottom: 1px solid transparent;
+}
+
+.link-button:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+}
+
+/* ============================================
+   SIDEBAR - ORDER SUMMARY (Sticky)
+   ============================================ */
+
+.checkout-sidebar .section-card.sticky {
+    position: sticky;
+    top: var(--space-md);
+}
+
+.sidebar-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--sand);
+    letter-spacing: 0.2px;
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+/* Custom scrollbar */
+.order-items::-webkit-scrollbar {
+    width: 4px;
+}
+
+.order-items::-webkit-scrollbar-track {
+    background: var(--cream);
+}
+
+.order-items::-webkit-scrollbar-thumb {
+    background: var(--sand);
+    border-radius: 2px;
+}
+
+.order-items::-webkit-scrollbar-thumb:hover {
+    background: var(--mist);
+}
+
+.order-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--sand);
+}
+
+.order-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.item-img {
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--sand);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--cream);
+}
+
+.item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 4px;
+    line-height: 1.3;
+}
+
+.item-qty {
+    font-size: 12px;
+    color: var(--ash);
+    margin: 0;
+}
+
+.item-price {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--copper);
+}
+
+.order-totals {
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--sand);
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+}
+
+.total-line span:first-child {
+    letter-spacing: 0.3px;
+}
+
+.total-line.final {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    padding-top: var(--space-sm);
+    margin-top: var(--space-sm);
+    border-top: 1px solid var(--sand);
+    margin-bottom: 0;
+}
+
+.total-value {
+    color: var(--copper);
+}
+
+.subtotal-value {
+    font-family: var(--font-display);
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-lg) var(--space-md);
+    background: var(--cream);
+}
+
+.empty-state p {
+    color: var(--ash);
+    margin: 0 0 var(--space-md);
+    font-size: 14px;
+}
+
+.empty-text {
+    text-align: center;
+    padding: var(--space-md);
+    color: var(--ash);
+    font-size: 13px;
+    font-style: italic;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 10px 24px;
+    background: white;
+    color: var(--copper);
+    border: 1px solid var(--copper);
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background: var(--copper);
+    color: white;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .checkout-content {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .checkout-sidebar {
+        order: -1;
+    }
+    
+    .checkout-sidebar .section-card.sticky {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-wrapper {
+        padding: var(--space-sm) 0 var(--space-lg);
+    }
+    
+    .checkout-content {
+        padding: 0 var(--space-sm);
+    }
+    
+    .section-card {
+        padding: var(--space-md);
+    }
+    
+    .section-title {
+        font-size: 24px;
+    }
+    
+    .progress-container {
+        gap: 10px;
+    }
+    
+    .progress-line {
+        width: 48px;
+    }
+    
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+    
+    .progress-step span {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-card {
+        padding: var(--space-sm);
+        border-left: none;
+        border-right: none;
+    }
+    
+    .loyalty-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: var(--space-sm);
+    }
+    
+    .btn-primary,
+    .btn-text {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        justify-content: center;
+    }
+}

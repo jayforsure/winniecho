@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #3d3226; color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; background: #f9f9f9; }
+        .order-details { background: white; padding: 20px; margin: 20px 0; }
+        .item { border-bottom: 1px solid #ddd; padding: 15px 0; display: flex; justify-content: space-between; }
+        .total { font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px solid #333; }
+        .button { display: inline-block; padding: 15px 30px; background: #b8935a; color: white !important; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Confirmed!</h1>
+            <p>Thank you for your purchase</p>
+        </div>
+        <div class="content">
+            <h2>Hello, {{ order.address.user.name }}!</h2>
+            <p>Your order has been confirmed and is being processed.</p>
+            
+            <div class="order-details">
+                <h3>Order #{{ order.order_number }}</h3>
+                <p><strong>Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</p>
+                <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+                
+                <h4 style="margin-top: 20px;">Items Ordered:</h4>
+                {% for item in items %}
+                <div class="item">
+                    <span>{{ item.product_name }} x{{ item.quantity }}</span>
+                    <span>RM {{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+                
+                <div class="total">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Subtotal:</span>
+                        <span>RM {{ order.subtotal }}</span>
+                    </div>
+                    {% if payment.discount_amount > 0 %}
+                    <div style="display: flex; justify-content: space-between; color: #4caf50;">
+                        <span>Discount:</span>
+                        <span>- RM {{ payment.discount_amount }}</span>
+                    </div>
+                    {% endif %}
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <span>Total:</span>
+                        <span>RM {{ payment.total_amount }}</span>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 20px;">Delivery Address:</h4>
+                <p>
+                    {{ order.address.address }}<br>
+                    {{ order.address.city }}, {{ order.address.state }}<br>
+                    {{ order.address.postal_code }}<br>
+                    {{ order.address.country }}
+                </p>
+                
+                <p><strong>Payment Method:</strong> {{ payment.get_method_display }}</p>
+            </div>
+            
+            <p>We'll send you another email when your order ships.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 WinnieCho. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

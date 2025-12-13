@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}WinnieCho - Artisan Chocolates{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Minimalist Hero Section -->
+<section class="hero-jp">
+    <div class="hero-video-wrap">
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="{% static 'vid/home.mp4' %}" type="video/mp4">
+        </video>
+        <div class="hero-gradient"></div>
+    </div>
+    
+    <div class="hero-content-jp">
+        <div class="hero-subtitle-jp">— Since 2006 —</div>
+        <h1 class="hero-title-jp">WinnieCho</h1>
+        <p class="hero-text-jp">Artisan chocolates crafted with passion</p>
+        <div class="hero-actions-jp">
+            <a href="{% url 'products' %}" class="hero-btn-jp primary">Explore Collection</a>
+            <a href="#story" class="hero-btn-jp secondary">Our Story</a>
+        </div>
+    </div>
+    
+    <div class="scroll-hint-jp">
+        <span class="scroll-line-jp"></span>
+        <span class="scroll-label-jp">Scroll</span>
+    </div>
+</section>
+
+<!-- Story Section -->
+<section id="story" class="story-jp">
+    <div class="story-intro-jp">
+        <div class="intro-grid-pattern"></div>
+        <div class="intro-wrapper-jp">
+            <h2>Crafting Excellence Since <i>2006</i></h2>
+            <p class="intro-desc-jp">Where Belgian tradition meets innovative flavors</p>
+        </div>
+    </div>
+    
+    <!-- Video Section -->
+    <div class="story-video-jp">
+        <video class="story-vid" autoplay muted loop playsinline>
+            <source src="{% static 'vid/home2.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+    
+    <!-- Text Section -->
+    <div class="story-text-jp">
+        <div class="text-grid-pattern"></div>
+        <div class="text-container-jp">
+            <p class="lead-jp">Born from a passion for premium cocoa, WinnieCho brings you handcrafted chocolates that delight the senses and warm the heart.</p>
+            
+            <p>Each chocolate begins with ethically sourced cocoa beans from sustainable farms. Our master chocolatiers combine traditional techniques with innovative flavors to create unforgettable tasting experiences.</p>
+            
+            <p>From rich dark chocolate truffles to creamy milk chocolate creations, every piece is crafted with attention to detail and a commitment to quality that you can taste in every bite.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Collections Section -->
+<section class="collections-jp">
+    <div class="collections-header-jp">
+        <h2>Our Collections</h2>
+        <p class="section-desc-jp">Discover our range of handcrafted chocolate delights</p>
+    </div>
+    
+    <div class="collections-grid-jp">
+        <!-- Dark Chocolate -->
+        <article class="collection-card-jp">
+            <div class="collection-image-jp">
+                <img src="{% static 'img/product/dark.jpg' %}" alt="Dark Chocolates">
+                <div class="collection-overlay-jp">
+                    <span class="collection-number-jp">01</span>
+                </div>
+            </div>
+            <div class="collection-content-jp">
+                <h3>Dark Chocolate</h3>
+                <p>Experience the intense richness of our premium dark chocolates, crafted with 70% to 95% cocoa content. Perfect for true chocolate connoisseurs.</p>
+                <a href="{% url 'products' %}?category=dark" class="collection-link-jp">
+                    Explore Dark
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+
+        <!-- Milk Chocolate -->
+        <article class="collection-card-jp">
+            <div class="collection-image-jp">
+                <img src="{% static 'img/product/milk.jpg' %}" alt="Milk Chocolates">
+                <div class="collection-overlay-jp">
+                    <span class="collection-number-jp">02</span>
+                </div>
+            </div>
+            <div class="collection-content-jp">
+                <h3>Milk Chocolate</h3>
+                <p>Indulge in our creamy, smooth milk chocolate creations. Made with fresh dairy and premium cocoa for perfect balance.</p>
+                <a href="{% url 'products' %}?category=milk" class="collection-link-jp">
+                    Explore Milk
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+
+        <!-- White Chocolate -->
+        <article class="collection-card-jp">
+            <div class="collection-image-jp">
+                <img src="{% static 'img/product/white.jpg' %}" alt="White Chocolates">
+                <div class="collection-overlay-jp">
+                    <span class="collection-number-jp">03</span>
+                </div>
+            </div>
+            <div class="collection-content-jp">
+                <h3>White Chocolate</h3>
+                <p>Discover the luxurious creaminess of our artisanal white chocolate. Made with premium cocoa butter and vanilla.</p>
+                <a href="{% url 'products' %}?category=white" class="collection-link-jp">
+                    Explore White
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+
+        <!-- Alcohol Infused -->
+        <article class="collection-card-jp">
+            <div class="collection-image-jp">
+                <img src="{% static 'img/product/alcohol.jpg' %}" alt="Alcohol Infused">
+                <div class="collection-overlay-jp">
+                    <span class="collection-number-jp">04</span>
+                </div>
+            </div>
+            <div class="collection-content-jp">
+                <h3>Alcohol Infused</h3>
+                <p>Savor the sophisticated blend of premium spirits and fine chocolate. Elegant combinations for adult indulgence.</p>
+                <a href="{% url 'products' %}?category=alcohol" class="collection-link-jp">
+                    Explore Spirits
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="values-jp">
+    <div class="values-container-jp">
+        <div class="values-intro-jp">
+            <h2>Why Choose WinnieCho</h2>
+            <p class="section-desc-jp">Premium quality and exceptional service in every chocolate</p>
+        </div>
+
+        <div class="values-grid-jp">
+            <div class="value-card-jp">
+                <div class="value-header-jp">
+                    <h3>Ethically Sourced</h3>
+                    <span class="value-tag-jp">Direct Trade</span>
+                </div>
+                <p>We work directly with sustainable cocoa farms to ensure fair prices for farmers and the finest quality beans.</p>
+            </div>
+
+            <div class="value-card-jp">
+                <div class="value-header-jp">
+                    <h3>Handcrafted Daily</h3>
+                    <span class="value-tag-jp">Fresh</span>
+                </div>
+                <p>Our chocolatiers craft small batches daily to ensure maximum freshness and optimal flavor in every piece.</p>
+            </div>
+
+            <div class="value-card-jp">
+                <div class="value-header-jp">
+                    <h3>Custom Orders</h3>
+                    <span class="value-tag-jp">Personalized</span>
+                </div>
+                <p>Create personalized chocolate gifts with custom packaging, monograms, or special flavor combinations.</p>
+            </div>
+
+            <div class="value-card-jp">
+                <div class="value-header-jp">
+                    <h3>Fast Delivery</h3>
+                    <span class="value-tag-jp">Nationwide</span>
+                </div>
+                <p>Enjoy fresh chocolate delivered with our temperature-controlled packaging and express shipping options.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-jp">
+    <div class="faq-container-jp">
+        <div class="faq-intro-jp">
+            <h2>Common Questions</h2>
+            <p class="section-desc-jp">Everything you need to know about our chocolates</p>
+        </div>
+
+        <div class="faq-list-jp">
+            <div class="faq-item-jp">
+                <h3>How should I store my chocolates?</h3>
+                <p>Store in a cool, dry place (16-18°C) away from direct sunlight and strong odors. Do not refrigerate as this can cause bloom.</p>
+            </div>
+
+            <div class="faq-item-jp">
+                <h3>Do you offer dairy-free or vegan options?</h3>
+                <p>Yes! We have a dedicated range of dark chocolates and vegan truffles made with plant-based ingredients.</p>
+            </div>
+
+            <div class="faq-cta-jp">
+                <a href="{% url 'home' %}" class="faq-btn-jp">More Questions?</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Intersection Observer for animations
+document.addEventListener('DOMContentLoaded', () => {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animated elements
+    const animatedElements = document.querySelectorAll(
+        '.story-intro-jp, .story-video-jp, .story-text-jp, .collection-card-jp, .value-card-jp, .faq-item-jp'
+    );
+    
+    animatedElements.forEach(el => observer.observe(el));
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} - WinnieCho{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order/order_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="receipt-wrapper">
+    <div class="receipt-container">
+        <!-- Success Banner -->
+        <div class="success-banner">
+            <div class="success-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <div class="success-text">
+                <h1>Order Confirmed</h1>
+                <p>Order #{{ order.order_number }} • {{ order.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+            <div class="success-badge">
+                <span class="status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+        </div>
+
+        <!-- Receipt Card -->
+        <div class="receipt-card">
+            <!-- Header -->
+            <div class="receipt-header">
+                <div class="company-info">
+                    <h2>WinnieCho</h2>
+                    <p>Premium Chocolate Shop</p>
+                </div>
+                <div class="receipt-info">
+                    <p class="receipt-label">RECEIPT</p>
+                    <p class="receipt-number">#{{ order.order_number }}</p>
+                    <p class="receipt-date">{{ order.created_at|date:"F d, Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="details-grid">
+                <div class="detail-box">
+                    <p class="detail-label">Customer</p>
+                    <p class="detail-value">{{ order.address.user.name }}</p>
+                    <p class="detail-sub">{{ order.address.user.email }}</p>
+                    <p class="detail-sub">{{ order.address.user.phone }}</p>
+                </div>
+
+                <div class="detail-box">
+                    <p class="detail-label">Delivery Address</p>
+                    <p class="detail-value">{{ order.address.address }}</p>
+                    <p class="detail-sub">{{ order.address.city }}, {{ order.address.state }}</p>
+                    <p class="detail-sub">{{ order.address.postal_code }}, {{ order.address.country }}</p>
+                </div>
+
+                <div class="detail-box">
+                    <p class="detail-label">Payment</p>
+                    <p class="detail-value">{{ payment.get_method_display }}</p>
+                    <p class="detail-sub status-{{ payment.status }}">{{ payment.get_status_display }}</p>
+                    {% if payment.transaction_id %}
+                    <p class="detail-sub">ID: {{ payment.transaction_id|truncatechars:20 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="detail-box">
+                    <p class="detail-label">Order Summary</p>
+                    <p class="detail-value">{{ order.get_total_items }} item{{ order.get_total_items|pluralize }}</p>
+                    {% if order.loyalty_points_used > 0 %}
+                    <p class="detail-sub">Points Used: {{ order.loyalty_points_used }}</p>
+                    {% endif %}
+                    {% if order.loyalty_points_earned > 0 %}
+                    <p class="detail-sub">Points Earned: +{{ order.loyalty_points_earned }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="items-section">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>
+                                <div class="item-cell">
+                                    <p class="item-name">{{ item.product_name }}</p>
+                                    <p class="item-category">{{ item.product.category.name }}</p>
+                                </div>
+                            </td>
+                            <td>RM {{ item.unit_price|floatformat:2 }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td class="amount">RM {{ item.subtotal|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="totals-rows">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>RM {{ order.subtotal|floatformat:2 }}</span>
+                    </div>
+                    
+                    {% if payment.discount_amount > 0 %}
+                    <div class="total-row discount">
+                        <span>Loyalty Discount</span>
+                        <span>-RM {{ payment.discount_amount|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="total-row final">
+                        <span>Total Paid</span>
+                        <span>RM {{ payment.total_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Note -->
+            <div class="receipt-footer">
+                <p>Thank you for your purchase!</p>
+                <p>For questions, contact us at support@WinnieCho.com</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="receipt-actions">
+            <button onclick="window.print()" class="btn-action btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"/>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                    <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                Print Receipt
+            </button>
+            <a href="{% url 'products' %}" class="btn-action btn-secondary">Continue Shopping</a>
+            <a href="{% url 'orders_history' %}" class="btn-action btn-secondary">Order History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

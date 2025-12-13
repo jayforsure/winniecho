@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - WinnieCho{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order/payment.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="payment-wrapper">
+    <!-- Progress Steps -->
+    <div class="checkout-progress">
+        <div class="progress-container">
+            <div class="progress-step active">
+                <div class="step-circle">1</div>
+                <span>Cart</span>
+            </div>
+            <div class="progress-line active"></div>
+            <div class="progress-step active">
+                <div class="step-circle">2</div>
+                <span>Checkout</span>
+            </div>
+            <div class="progress-line active"></div>
+            <div class="progress-step active current">
+                <div class="step-circle">3</div>
+                <span>Payment</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="payment-content">
+        <!-- Left Column - Payment Form -->
+        <div class="payment-main">
+            <div class="section-card">
+                <h2 class="section-title">Complete Payment</h2>
+                
+                <form id="paymentForm" method="POST" action="{% url 'process_payment' %}">
+                    {% csrf_token %}
+                    <!-- Delivery Address (READ-ONLY) -->
+                    <div class="form-section">
+                        <h3 class="subsection-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            Deliver To
+                        </h3>
+                        
+                        <div class="address-display-card">
+                            <div class="address-text">
+                                <p class="addr-name">{{ address.user.name }}</p>
+                                <p class="addr-details">{{ address.address }}, {{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                                <p class="addr-phone">📱 {{ address.user.phone }}</p>
+                            </div>
+                            <!-- REMOVED: Change button -->
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <div class="form-section">
+                        <h3 class="subsection-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                            </svg>
+                            Payment Method
+                        </h3>
+                        
+                        <div class="payment-methods-grid">
+                            <!-- Stripe -->
+                            <label class="payment-method-card">
+                                <input type="radio" name="payment_method" value="ST" checked>
+                                <div class="method-content">
+                                    <div class="method-header">
+                                        <div class="method-icon stripe">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                                <rect x="1" y="4" width="22" height="16" rx="2"/>
+                                                <line x1="1" y1="10" x2="23" y2="10"/>
+                                            </svg>
+                                        </div>
+                                        <div class="method-text">
+                                            <h4>Card Payment</h4>
+                                            <p>Visa, Mastercard</p>
+                                        </div>
+                                    </div>
+                                    <div class="check-mark">✓</div>
+                                </div>
+                            </label>
+                            
+                            <!-- PayPal -->
+                            <label class="payment-method-card">
+                                <input type="radio" name="payment_method" value="PP">
+                                <div class="method-content">
+                                    <div class="method-header">
+                                        <div class="method-icon paypal">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#003087">
+                                                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .755-.645h6.469c1.988 0 3.544.422 4.631 1.257 1.089.833 1.635 2.065 1.635 3.658 0 1.474-.35 2.744-1.053 3.799-.701 1.053-1.69 1.856-2.966 2.397-1.277.542-2.797.813-4.561.813H8.14l-1.064 6.338z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="method-text">
+                                            <h4>PayPal</h4>
+                                            <p>PayPal account</p>
+                                        </div>
+                                    </div>
+                                    <div class="check-mark">✓</div>
+                                </div>
+                            </label>
+                            
+                            <!-- COD -->
+                            <label class="payment-method-card">
+                                <input type="radio" name="payment_method" value="COD">
+                                <div class="method-content">
+                                    <div class="method-header">
+                                        <div class="method-icon cod">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            </svg>
+                                        </div>
+                                        <div class="method-text">
+                                            <h4>Cash on Delivery</h4>
+                                            <p>Pay when delivered</p>
+                                        </div>
+                                    </div>
+                                    <div class="check-mark">✓</div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- Payment Info -->
+                        <div class="payment-info-box" id="paymentInfo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            <p id="paymentInfoText">Secure payment via Stripe</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms -->
+                    <div class="terms-section">
+                        <label class="terms-checkbox">
+                            <input type="checkbox" name="terms" required>
+                            <span>I agree to <a href="#">Terms & Conditions</a></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <!-- FIXED: Back goes to checkout, not products -->
+                        <a href="{% url 'checkout' %}" class="btn-text">← Back to Checkout</a>
+                        <button type="submit" class="btn-primary btn-pay">
+                            Pay RM {{ total|floatformat:2 }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Right Column - Order Summary -->
+        <div class="payment-sidebar">
+            <div class="section-card sticky">
+                <h3 class="sidebar-title">Order Summary</h3>
+                
+                <div class="order-items">
+                    {% for item in order_items %}
+                    <div class="order-item">
+                        <div class="item-img">
+                            {% with image=item.product.get_primary_image %}
+                            {% if image %}
+                            <img src="{{ image.image.url }}" alt="{{ item.product.name }}">
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        <div class="item-info">
+                            <p class="item-name">{{ item.product_name }}</p>
+                            <p class="item-qty">Qty: {{ item.quantity }}</p>
+                        </div>
+                        <div class="item-price">RM {{ item.subtotal|floatformat:2 }}</div>
+                    </div>
+                    {% empty %}
+                    <p class="empty-text">No items</p>
+                    {% endfor %}
+                </div>
+                
+                <div class="order-totals">
+                    <div class="total-line">
+                        <span>Subtotal</span>
+                        <span>RM {{ subtotal|floatformat:2 }}</span>
+                    </div>
+                    {% if loyalty_discount > 0 %}
+                    <div class="total-line discount">
+                        <span>Loyalty Discount</span>
+                        <span>- RM {{ loyalty_discount|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="total-line final">
+                        <span>Total</span>
+                        <span>RM {{ total|floatformat:2 }}</span>
+                    </div>
+                </div>
+                
+                <div class="security-badges">
+                    <div class="badge-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span>Secure Payment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const paymentInfoText = document.getElementById('paymentInfoText');
+    const paymentForm = document.getElementById('paymentForm');
+    
+    const infoMessages = {
+        'ST': 'Secure payment via Stripe',
+        'PP': 'You\'ll be redirected to PayPal',
+        'COD': 'Pay cash when your order arrives'
+    };
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            paymentInfoText.textContent = infoMessages[this.value] || '';
+        });
+    });
+    
+    // Handle form submission
+    paymentForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const button = this.querySelector('.btn-pay');
+        const originalHTML = button.innerHTML;
+        
+        button.disabled = true;
+        button.innerHTML = '<span>Processing...</span>';
+        
+        try {
+            const response = await fetch('{% url "process_payment" %}', {
+                method: 'POST',
+                headers: {'X-CSRFToken': formData.get('csrfmiddlewaretoken')},
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.redirect) {
+                // Check if redirect is a full URL or path
+                if (data.redirect.startsWith('http')) {
+                    window.location.href = data.redirect;
+                } else {
+                    // Ensure it starts with slash for relative paths
+                    window.location.href = data.redirect.startsWith('/') 
+                        ? data.redirect 
+                        : '/' + data.redirect;
+                }
+            } else {
+                alert(data.error || 'Payment failed');
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,878 @@
+/* ============================================
+   AUTH PAGES - Japanese Modern Style
+   Minimalist, Elegant, Refined
+   ============================================ */
+
+:root {
+    /* Japanese-inspired Color Palette */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    
+    /* Spacing Scale */
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 64px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--ink);
+    line-height: 1.6;
+}
+
+/* ============================================
+   AUTH SECTION (Minimalist Background)
+   ============================================ */
+
+.auth-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    padding: var(--space-lg) var(--space-md);
+}
+
+/* Remove heavy background image effect */
+.auth-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+}
+
+/* Simplified overlay */
+.auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(250, 250, 248, 0.95) 0%,
+        rgba(245, 245, 240, 0.98) 100%
+    );
+    pointer-events: none;
+}
+
+/* Remove floating particles (too busy for Japanese aesthetic) */
+.particles {
+    display: none;
+}
+
+/* ============================================
+   CONTAINER (Centered, Elegant)
+   ============================================ */
+
+.auth-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    gap: var(--space-xl);
+    align-items: center;
+}
+
+.register-section .auth-container {
+    max-width: 1200px;
+    grid-template-columns: 400px 1fr;
+}
+
+/* ============================================
+   BRANDING SIDE (Minimal)
+   ============================================ */
+
+.auth-branding {
+    padding: var(--space-lg);
+    color: var(--ink);
+}
+
+.brand-content {
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.brand-title {
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    margin: 0 0 var(--space-sm);
+    line-height: 1.2;
+    color: var(--ink);
+}
+
+.brand-subtitle {
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    color: var(--charcoal);
+    margin: 0 0 var(--space-xl);
+    line-height: 1.6;
+}
+
+/* ============================================
+   FEATURES LIST (Minimal)
+   ============================================ */
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    padding: 12px 0;
+    color: var(--charcoal);
+    border-bottom: 1px solid var(--sand);
+    transition: all 0.3s ease;
+}
+
+.feature-item:last-child {
+    border-bottom: none;
+}
+
+.feature-item:hover {
+    padding-left: 8px;
+    color: var(--copper);
+}
+
+.feature-item svg {
+    flex-shrink: 0;
+    color: var(--copper);
+    stroke-width: 1.5;
+}
+
+/* ============================================
+   BENEFITS GRID (Register - Minimal)
+   ============================================ */
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.benefit-card {
+    padding: var(--space-md);
+    background: white;
+    border: 1px solid var(--sand);
+    border-left: 3px solid var(--copper);
+    transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.benefit-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.benefit-icon svg {
+    color: var(--copper);
+    stroke-width: 1.5;
+}
+
+.benefit-card h4 {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 6px;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+}
+
+.benefit-card p {
+    font-size: 13px;
+    color: var(--ash);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ============================================
+   FORM SIDE (Clean Card)
+   ============================================ */
+
+.auth-form-wrapper {
+    animation: fadeIn 0.8s ease 0.2s both;
+}
+
+.auth-form-card {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 2px;
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.register-section .auth-form-card {
+    padding: var(--space-lg);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--sand);
+}
+
+.form-header h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+    margin: 0 0 var(--space-xs);
+}
+
+.form-header p {
+    font-size: 13px;
+    color: var(--ash);
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+/* ============================================
+   MESSAGES (Minimal)
+   ============================================ */
+
+.messages-wrapper {
+    margin-bottom: var(--space-md);
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px var(--space-sm);
+    font-size: 13px;
+    margin-bottom: 10px;
+    border-left: 3px solid;
+    background: var(--cream);
+    animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.alert-error {
+    background: rgba(185, 92, 92, 0.08);
+    border-left-color: var(--red);
+    color: var(--red);
+}
+
+.alert-success {
+    background: rgba(122, 148, 121, 0.08);
+    border-left-color: var(--green);
+    color: var(--green);
+}
+
+.alert-warning {
+    background: rgba(184, 147, 90, 0.08);
+    border-left-color: var(--gold);
+    color: var(--gold);
+}
+
+.alert svg {
+    flex-shrink: 0;
+    stroke-width: 1.5;
+}
+
+/* ============================================
+   FORM STYLES (Minimal)
+   ============================================ */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+    margin-bottom: var(--space-xs);
+    text-transform: uppercase;
+}
+
+.form-label svg {
+    color: var(--copper);
+    stroke-width: 1.5;
+}
+
+.form-input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px var(--space-sm);
+    font-size: 14px;
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    background: white;
+    font-family: var(--font-primary);
+    color: var(--ink);
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--copper);
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
+}
+
+.form-input::placeholder,
+textarea::placeholder {
+    color: var(--mist);
+}
+
+/* Textarea */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+}
+
+/* Select Wrapper */
+.select-wrapper {
+    position: relative;
+}
+
+select {
+    appearance: none;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.select-arrow {
+    position: absolute;
+    right: var(--space-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--ash);
+    stroke-width: 1.5;
+}
+
+/* Input Border Animation (Removed - too flashy) */
+.input-border {
+    display: none;
+}
+
+/* ============================================
+   PASSWORD WRAPPER
+   ============================================ */
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--ash);
+    transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: var(--copper);
+}
+
+.toggle-password svg {
+    stroke-width: 1.5;
+}
+
+/* ============================================
+   PASSWORD STRENGTH (Minimal)
+   ============================================ */
+
+.password-strength {
+    margin-top: var(--space-xs);
+}
+
+.strength-bar {
+    height: 2px;
+    background: var(--sand);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--ash);
+    transition: all 0.3s ease;
+}
+
+.strength-fill.weak {
+    width: 33%;
+    background: var(--red);
+}
+
+.strength-fill.medium {
+    width: 66%;
+    background: var(--gold);
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: var(--green);
+}
+
+.strength-text {
+    font-size: 11px;
+    color: var(--ash);
+    letter-spacing: 0.2px;
+}
+
+/* ============================================
+   FORM OPTIONS
+   ============================================ */
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: calc(-1 * var(--space-xs));
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--charcoal);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--sand);
+    position: relative;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkmark {
+    background: var(--copper);
+    border-color: var(--copper);
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkmark::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+}
+
+.forgot-link {
+    font-size: 13px;
+    color: var(--copper);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.forgot-link:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+}
+
+/* ============================================
+   SUBMIT BUTTON (Minimal)
+   ============================================ */
+
+.btn-submit {
+    width: 100%;
+    padding: 14px var(--space-md);
+    background: var(--copper);
+    color: white;
+    border: none;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit:hover {
+    background: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit:disabled {
+    background: var(--mist);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+    stroke-width: 2;
+}
+
+.btn-submit:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+/* Remove flashy shine effect */
+.btn-submit::before {
+    display: none;
+}
+
+/* ============================================
+   DIVIDER (Minimal)
+   ============================================ */
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: var(--space-lg) 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: var(--sand);
+}
+
+.divider span {
+    position: relative;
+    background: white;
+    padding: 0 var(--space-sm);
+    font-size: 12px;
+    color: var(--ash);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   SOCIAL LOGIN (Minimal)
+   ============================================ */
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.social-btn {
+    width: 100%;
+    padding: 12px var(--space-md);
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    border-color: var(--copper);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-xs);
+}
+
+.google-btn svg {
+    flex-shrink: 0;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--sand);
+}
+
+.auth-footer p {
+    font-size: 13px;
+    color: var(--charcoal);
+    margin: 0;
+}
+
+.link-primary {
+    color: var(--copper);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.link-primary:hover {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+}
+
+/* ============================================
+   ADDRESS SECTION (Register Page)
+   ============================================ */
+
+.form-section {
+    margin: var(--space-md) 0;
+    padding: var(--space-md);
+    background: var(--cream);
+    border-left: 3px solid var(--copper);
+}
+
+.section-header {
+    margin-bottom: var(--space-md);
+}
+
+.section-header h3 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: var(--ink);
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header h3 svg {
+    color: var(--copper);
+    stroke-width: 1.5;
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--ash);
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+/* Address Grid */
+.address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    align-items: start;
+}
+
+.address-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+/* Postal Code */
+#postal_code {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    font-weight: 500;
+}
+
+/* ============================================
+   VALIDATION STATES
+   ============================================ */
+
+.form-input:invalid:not(:focus):not(:placeholder-shown),
+textarea:invalid:not(:focus):not(:placeholder-shown),
+select:invalid:not(:focus) {
+    border-color: rgba(185, 92, 92, 0.3);
+}
+
+.form-input:valid:not(:focus):not(:placeholder-shown),
+textarea:valid:not(:focus):not(:placeholder-shown),
+select:valid:not(:focus) {
+    border-color: rgba(122, 148, 121, 0.3);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        max-width: 520px;
+        gap: var(--space-lg);
+    }
+    
+    .auth-branding {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .auth-section {
+        padding: var(--space-md);
+    }
+    
+    .auth-form-card {
+        padding: var(--space-lg);
+    }
+    
+    .brand-title {
+        font-size: 32px;
+    }
+    
+    .address-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-form-card {
+        padding: var(--space-md);
+    }
+    
+    .form-header h2 {
+        font-size: 24px;
+    }
+    
+    .form-section {
+        padding: var(--space-sm);
+    }
+}
+
+/* ============================================
+   SPINNER ANIMATION
+   ============================================ */
+
+.spinner {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   FOCUS STATES
+   ============================================ */
+
+.form-group.focused .form-label {
+    color: var(--copper);
+}

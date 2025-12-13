@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WinnieCho - Artisan Chocolates{% endblock %}</title>
+    
+    <!-- Fonts (Japanese Modern) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Base Styles -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    
+    <!-- Page Specific Styles -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body data-user-logged-in="{% if request.session.user_id %}true{% else %}false{% endif %}">
+    <!-- Minimalist Navigation -->
+    <nav class="nav-jp">
+        <div class="nav-container-jp">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="nav-logo-jp">
+                <span class="logo-main">WinnieCho</span>
+                <span class="logo-sub">— Chocolatier —</span>
+            </a>
+            
+            <!-- Main Menu -->
+            <div class="nav-menu-jp">
+                <a href="{% url 'home' %}" class="nav-link-jp">Home</a>
+                <a href="{% url 'products' %}" class="nav-link-jp">Collection</a>
+                {% if request.session.user_id %}
+                    <a href="{% url 'dashboard' %}" class="nav-link-jp">Dashboard</a>
+                    <a href="{% url 'ai_chat' %}" class="nav-link-jp">AI Chat</a>
+                {% endif %}
+            </div>
+            
+            <!-- Actions -->
+            <div class="nav-actions-jp">
+                {% if request.session.user_id %}
+                    <a href="{% url 'cart' %}" class="nav-icon-jp">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        <span class="cart-badge-jp" id="cartCount">0</span>
+                    </a>
+                    <span class="nav-user-jp">{{ request.session.user_name }}</span>
+                    <a href="{% url 'logout' %}" class="nav-btn-jp logout">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-btn-jp">Login</a>
+                    <a href="{% url 'register' %}" class="nav-btn-jp primary">Register</a>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle-jp" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Messages (Minimalist) -->
+    {% if messages %}
+    <div class="messages-jp">
+        {% for message in messages %}
+        <div class="message-jp message-{{ message.tags }}">
+            <div class="message-content-jp">
+                <span class="message-dot-jp"></span>
+                <span>{{ message }}</span>
+            </div>
+            <button class="message-close-jp">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Minimalist Footer -->
+    <footer class="footer-jp">
+        <div class="footer-container-jp">
+            <!-- Main Footer -->
+            <div class="footer-grid-jp">
+                <!-- Brand Column -->
+                <div class="footer-col-jp">
+                    <h3 class="footer-brand-jp">WinnieCho</h3>
+                    <p class="footer-tagline-jp">— Chocolatier —</p>
+                    <p class="footer-text-jp">Handcrafted chocolates with passion and precision</p>
+                    <p class="footer-year-jp">Est. 2006</p>
+                </div>
+                
+                <!-- Links Column -->
+                <div class="footer-col-jp">
+                    <h4 class="footer-title-jp">Navigate</h4>
+                    <div class="footer-divider-jp"></div>
+                    <a href="{% url 'home' %}" class="footer-link-jp">Home</a>
+                    <a href="{% url 'products' %}" class="footer-link-jp">Collection</a>
+                    {% if request.session.user_id %}
+                        <a href="{% url 'dashboard' %}" class="footer-link-jp">Dashboard</a>
+                    {% endif %}
+                </div>
+                
+                <!-- Support Column -->
+                <div class="footer-col-jp">
+                    <h4 class="footer-title-jp">Support</h4>
+                    <div class="footer-divider-jp"></div>
+                    <a href="#" class="footer-link-jp">Contact</a>
+                    <a href="#" class="footer-link-jp">Shipping</a>
+                    <a href="#" class="footer-link-jp">Returns</a>
+                    <a href="#" class="footer-link-jp">FAQ</a>
+                </div>
+                
+                <!-- Connect Column -->
+                <div class="footer-col-jp">
+                    <h4 class="footer-title-jp">Connect</h4>
+                    <div class="footer-divider-jp"></div>
+                    <a href="#" class="footer-link-jp">Instagram</a>
+                    <a href="#" class="footer-link-jp">Facebook</a>
+                    <a href="#" class="footer-link-jp">Twitter</a>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom-jp">
+                <p>&copy; 2024 WinnieCho. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Base Scripts -->
+    <script src="{% static 'js/base.js' %}"></script>
+    
+    <!-- Page Specific Scripts -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

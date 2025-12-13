@@ -1,0 +1,327 @@
+/* ===================================
+   PAYMENT SUCCESS - Modern & Animated
+   =================================== */
+
+:root {
+    --primary: #3d3226;
+    --accent: #b8935a;
+    --bg: #fafafa;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-light: #6b6b6b;
+    --border: #e5e5e5;
+    --success: #4caf50;
+    --info: #2196f3;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+* { box-sizing: border-box; }
+
+.success-wrapper {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.success-container {
+    max-width: 600px;
+    width: 100%;
+}
+
+/* ===================================
+   Success Animation
+   =================================== */
+.success-animation {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+    animation: fadeInDown 0.5s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.checkmark-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(76, 175, 80, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.checkmark {
+    width: 80px;
+    height: 80px;
+}
+
+.checkmark-circle-path {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke: var(--success);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    animation-delay: 0.2s;
+}
+
+.checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke: var(--success);
+    stroke-width: 3;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* ===================================
+   Success Message
+   =================================== */
+.success-message {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeInUp 0.6s ease;
+    animation-delay: 0.3s;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-message h1 {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 12px;
+    letter-spacing: -0.5px;
+}
+
+.success-message p {
+    font-size: 16px;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ===================================
+   Summary Card
+   =================================== */
+.summary-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.6s ease;
+    animation-delay: 0.4s;
+    animation-fill-mode: both;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row .label {
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.summary-row .value {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.summary-row .value.highlight {
+    font-size: 20px;
+    color: var(--success);
+}
+
+/* ===================================
+   Quick Actions
+   =================================== */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.6s ease;
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 2px 8px rgba(184, 147, 90, 0.2);
+}
+
+.btn-primary:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(184, 147, 90, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text);
+    border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ===================================
+   Info Box
+   =================================== */
+.info-box {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 20px;
+    background: rgba(33, 150, 243, 0.05);
+    border-left: 4px solid var(--info);
+    border-radius: var(--radius);
+    animation: fadeInUp 0.6s ease;
+    animation-delay: 0.6s;
+    animation-fill-mode: both;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    color: var(--info);
+    margin-top: 2px;
+}
+
+.info-text {
+    flex: 1;
+}
+
+.info-text p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin: 0 0 8px;
+    line-height: 1.6;
+}
+
+.info-text p:last-child {
+    margin-bottom: 0;
+}
+
+.info-text strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* ===================================
+   Responsive
+   =================================== */
+@media (max-width: 640px) {
+    .success-wrapper {
+        padding: 30px 15px;
+    }
+
+    .success-message h1 {
+        font-size: 26px;
+    }
+
+    .success-message p {
+        font-size: 14px;
+    }
+
+    .checkmark-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .checkmark {
+        width: 64px;
+        height: 64px;
+    }
+
+    .summary-card {
+        padding: 20px;
+    }
+
+    .summary-row .value.highlight {
+        font-size: 18px;
+    }
+
+    .info-box {
+        padding: 16px;
+    }
+}
+
+/* ===================================
+   Print Hide
+   =================================== */
+@media print {
+    .success-wrapper {
+        display: none;
+    }
+}

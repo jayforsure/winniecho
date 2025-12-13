@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - WinnieCho{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Page Title (Minimal) -->
+<div class="page-title-jp">
+    <div class="container-medium">
+        <div class="title-content-jp">
+            <h1 class="page-heading-jp">Cart</h1>
+            <p class="page-breadcrumb-jp">Home /<br> Cart</p>
+        </div>
+    </div>
+</div>
+
+<section class="cart-section">
+    <div class="cart-container">
+        
+        <!-- Loading State -->
+        <div id="cartLoading" style="text-align: center; padding: 60px; display: none;">
+            <p style="color: var(--ash);">Loading cart...</p>
+        </div>
+        
+        <div id="cartContent">
+            {% if cart and not cart.is_empty %}
+            <div class="cart-grid">
+                <!-- Cart Items -->
+                <div class="cart-items">
+                    {% for item in cart.items.all %}
+                    <div class="cart-item" data-item-id="{{ item.id }}" data-product-id="{{ item.product.id }}">
+                        <div class="cart-item-image">
+                            {% with primary_image=item.product.get_primary_image %}
+                            {% if primary_image %}
+                            <img src="{{ primary_image.image.url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                            <div class="cart-item-image-placeholder">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        
+                        <div class="cart-item-details">
+                            <h3 class="cart-item-name">{{ item.product.name }}</h3>
+                            <span class="cart-item-category">{{ item.product.category.name }}</span>
+                            <p class="cart-item-price">RM {{ item.product.price }} each</p>
+                        </div>
+                        
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn qty-decrease" data-item-id="{{ item.id }}">−</button>
+                            <input type="number" value="{{ item.quantity }}" readonly class="qty-input" data-item-id="{{ item.id }}">
+                            <button class="qty-btn qty-increase" data-item-id="{{ item.id }}">+</button>
+                        </div>
+                        
+                        <div class="cart-item-total">
+                            <p class="item-total-price" data-item-id="{{ item.id }}">RM {{ item.get_total_price }}</p>
+                            <button class="cart-item-remove" data-item-id="{{ item.id }}">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                    <line x1="10" y1="11" x2="10" y2="17"/>
+                                    <line x1="14" y1="11" x2="14" y2="17"/>
+                                </svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Cart Summary -->
+                <div class="cart-summary">
+                    <h2 class="summary-title">Order Summary</h2>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal (<span id="itemCount">{{ cart.get_total_items }}</span> item<span id="itemPlural">{{ cart.get_total_items|pluralize }}</span>)</span>
+                        <span id="cartSubtotal">RM {{ cart.get_subtotal }}</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="cartTotal">RM {{ cart.get_total }}</span>
+                    </div>
+                    
+                    <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout</a>
+                    <a href="{% url 'products' %}" class="continue-shopping">Continue Shopping</a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty Cart -->
+            <div class="empty-cart">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                <h2>Your cart is empty</h2>
+                <p>Add some delicious chocolates to your cart</p>
+                <a href="{% url 'products' %}" class="shop-now-btn">Shop Now</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// =====================
+// SYNC LOCALSTORAGE CART TO DJANGO ON PAGE LOAD
+// =====================
+
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🛒 Cart page loaded - checking localStorage');
+    
+    // ✅ CHECK IF ALREADY SYNCED (prevent infinite loop)
+    const alreadySynced = sessionStorage.getItem('cart_synced');
+    
+    if (alreadySynced === 'true') {
+        console.log('✅ Already synced this session, clearing flag');
+        sessionStorage.removeItem('cart_synced');
+        
+        // ✅ UPDATE LOCALSTORAGE FROM DJANGO CART
+        syncDjangoToLocalStorage();
+        
+        // ✅ SETUP EVENT LISTENERS
+        setupEventListeners();
+        return;
+    }
+    
+    // Check if localStorage has items
+    const localCart = localStorage.getItem('chocolateCart');
+    
+    if (localCart) {
+        try {
+            const cartItems = JSON.parse(localCart);
+            
+            if (cartItems && cartItems.length > 0) {
+                console.log(`📦 Found ${cartItems.length} items in localStorage, syncing...`);
+                
+                // Show loading
+                document.getElementById('cartLoading').style.display = 'block';
+                document.getElementById('cartContent').style.display = 'none';
+                
+                // Sync to Django
+                await syncLocalCartToDjango(cartItems);
+                
+                // ✅ SET FLAG BEFORE RELOAD (prevent infinite loop)
+                sessionStorage.setItem('cart_synced', 'true');
+                
+                // Reload page to show synced cart
+                console.log('✅ Sync complete, reloading page');
+                window.location.reload();
+            } else {
+                console.log('✅ localStorage cart is empty');
+                syncDjangoToLocalStorage();
+                setupEventListeners();
+            }
+        } catch (e) {
+            console.error('Error parsing localStorage cart:', e);
+            setupEventListeners();
+        }
+    } else {
+        console.log('✅ No localStorage cart found');
+        syncDjangoToLocalStorage();
+        setupEventListeners();
+    }
+});
+
+// ✅ NEW: Sync Django cart to localStorage
+function syncDjangoToLocalStorage() {
+    console.log('🔄 Syncing Django cart to localStorage...');
+    
+    const cartItems = [];
+    const cartItemElements = document.querySelectorAll('.cart-item');
+    
+    cartItemElements.forEach(itemElem => {
+        const productId = itemElem.dataset.productId;
+        const itemId = itemElem.dataset.itemId;
+        const name = itemElem.querySelector('.cart-item-name').textContent;
+        const price = parseFloat(itemElem.querySelector('.cart-item-price').textContent.replace('RM ', '').replace(' each', ''));
+        const quantity = parseInt(itemElem.querySelector('.qty-input').value);
+        const category = itemElem.querySelector('.cart-item-category').textContent;
+        const imageElem = itemElem.querySelector('.cart-item-image img');
+        const image = imageElem ? imageElem.src : '';
+        
+        cartItems.push({
+            id: productId,
+            name: name,
+            price: price,
+            quantity: quantity,
+            category: category,
+            image: image
+        });
+    });
+    
+    localStorage.setItem('chocolateCart', JSON.stringify(cartItems));
+    console.log(`✅ Synced ${cartItems.length} items to localStorage`);
+}
+
+async function syncLocalCartToDjango(cartItems) {
+    const csrfToken = getCookie('csrftoken');
+    
+    if (!csrfToken) {
+        console.error('❌ No CSRF token');
+        return false;
+    }
+    
+    // Clear Django cart first
+    try {
+        await fetch('/cart/clear/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        });
+    } catch (e) {
+        console.log('Note: clear endpoint may not exist');
+    }
+    
+    // Add each item
+    for (const item of cartItems) {
+        const formData = new FormData();
+        formData.append('quantity', item.quantity);
+        formData.append('sync', 'true');
+        
+        try {
+            const response = await fetch(`/cart/add/${item.id}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                body: formData
+            });
+            
+            if (response.ok) {
+                console.log(`✅ Synced: ${item.name} x${item.quantity}`);
+            } else {
+                console.error(`❌ Failed to sync: ${item.name}`);
+            }
+        } catch (error) {
+            console.error(`❌ Error syncing ${item.name}:`, error);
+        }
+    }
+    
+    return true;
+}
+
+// ✅ NEW: Setup event listeners with event delegation
+function setupEventListeners() {
+    console.log('🎯 Setting up event listeners...');
+    
+    // Use event delegation for quantity buttons
+    document.addEventListener('click', function(e) {
+        // Decrease quantity
+        if (e.target.classList.contains('qty-decrease')) {
+            const itemId = e.target.dataset.itemId;
+            const qtyInput = document.querySelector(`.qty-input[data-item-id="${itemId}"]`);
+            const currentQty = parseInt(qtyInput.value);
+            if (currentQty > 1) {
+                updateQuantity(itemId, currentQty - 1);
+            }
+        }
+        
+        // Increase quantity
+        if (e.target.classList.contains('qty-increase')) {
+            const itemId = e.target.dataset.itemId;
+            const qtyInput = document.querySelector(`.qty-input[data-item-id="${itemId}"]`);
+            const currentQty = parseInt(qtyInput.value);
+            updateQuantity(itemId, currentQty + 1);
+        }
+        
+        // Remove item
+        if (e.target.closest('.cart-item-remove')) {
+            const button = e.target.closest('.cart-item-remove');
+            const itemId = button.dataset.itemId;
+            removeItem(itemId);
+        }
+    });
+}
+
+// =====================
+// CART FUNCTIONS
+// =====================
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateQuantity(itemId, newQuantity) {
+    console.log(`🔄 Updating item ${itemId} to quantity ${newQuantity}`);
+    
+    if (newQuantity < 1) return;
+    
+    fetch(`/cart/update/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `quantity=${newQuantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Cart updated successfully');
+            
+            // ✅ UPDATE QUANTITY INPUT VALUE
+            const qtyInput = document.querySelector(`.qty-input[data-item-id="${itemId}"]`);
+            if (qtyInput) {
+                qtyInput.value = newQuantity;
+            }
+            
+            // Update item total
+            const itemTotalElem = document.querySelector(`.item-total-price[data-item-id="${itemId}"]`);
+            if (itemTotalElem) {
+                itemTotalElem.textContent = `RM ${data.item_total.toFixed(2)}`;
+            }
+            
+            // Update cart total
+            const cartTotalElem = document.getElementById('cartTotal');
+            const cartSubtotalElem = document.getElementById('cartSubtotal');
+            if (cartTotalElem && cartSubtotalElem) {
+                cartTotalElem.textContent = `RM ${data.cart_total.toFixed(2)}`;
+                cartSubtotalElem.textContent = `RM ${data.cart_total.toFixed(2)}`;
+            }
+            
+            // ✅ UPDATE LOCALSTORAGE IMMEDIATELY
+            syncDjangoToLocalStorage();
+            
+        } else {
+            alert(data.error || 'Failed to update cart');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the cart');
+    });
+}
+
+function removeItem(itemId) {
+    if (!confirm('Remove this item from cart?')) return;
+    
+    console.log(`🗑️ Removing item ${itemId}`);
+    
+    fetch(`/cart/remove/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Item removed successfully');
+            
+            // Remove item from DOM
+            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            if (cartItem) {
+                cartItem.remove();
+            }
+            
+            // ✅ UPDATE LOCALSTORAGE IMMEDIATELY
+            syncDjangoToLocalStorage();
+            
+            // Check if cart is empty
+            const remainingItems = document.querySelectorAll('.cart-item');
+            if (remainingItems.length === 0) {
+                // Clear localStorage
+                localStorage.removeItem('chocolateCart');
+                location.reload();
+            } else {
+                // Update item count
+                const itemCountElem = document.getElementById('itemCount');
+                if (itemCountElem) {
+                    const newCount = remainingItems.length;
+                    itemCountElem.textContent = newCount;
+                    document.getElementById('itemPlural').textContent = newCount === 1 ? '' : 's';
+                }
+            }
+        } else {
+            alert(data.error || 'Failed to remove item');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+</script>
+{% endblock %}
