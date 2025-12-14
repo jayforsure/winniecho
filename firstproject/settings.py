@@ -238,7 +238,6 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
 # Gemini AI Configuration
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-GEMINI_MODEL = 'gemini-pro'
 
 # Configure Gemini AI
 if GEMINI_API_KEY:
