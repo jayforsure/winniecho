@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from . import views_ai
 from django.http import HttpResponse
 
 urlpatterns = [
@@ -57,11 +58,12 @@ urlpatterns = [
     path('addresses/<int:address_id>/delete/', views.delete_address, name='delete_address'),
     
     # AI Chat
-    path('ai_chat/', views.ai_chat_view, name='ai_chat'),
+    path('ai-chat/', views_ai.ai_chat_view, name='ai_chat'),
+    path('api/chat/', views_ai.chat_api, name='chat_api'),
     
     # Admin
     path('admin_panel/', views.admin_dashboard, name='admin_dashboard'),
-
+    
     path('auth/', include('social_django.urls', namespace='social')),
 ]
 

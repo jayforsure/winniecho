@@ -2,12 +2,14 @@
 Django settings for chocolate_ordering_system project.
 PRODUCTION CONFIGURATION FOR AWS DEPLOYMENT
 """
+import pymysql
+pymysql.install_as_MySQLdb()
 
 import os
 from pathlib import Path
+import google.generativeai as genai
 from dotenv import load_dotenv
-import pymysql
-pymysql.install_as_MySQLdb()
+
 
 # Load environment variables
 load_dotenv()
@@ -233,6 +235,21 @@ PAYPAL_CLIENT_SECRET = os.getenv(
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+
+# Gemini AI Configuration
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = 'gemini-pro'
+
+# Configure Gemini AI
+if GEMINI_API_KEY:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        GEMINI_AVAILABLE = True
+    except Exception as e:
+        print(f"Gemini AI configuration error: {e}")
+        GEMINI_AVAILABLE = False
+else:
+    GEMINI_AVAILABLE = False
 
 # =====================
 # LOGGING

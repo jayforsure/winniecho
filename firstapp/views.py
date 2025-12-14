@@ -691,6 +691,7 @@ def paypal_success(request, payment_id):
         
         if paypal_payment.execute({"payer_id": payer_id}):
             # Payment successful
+            payment.order.status = 'C'
             payment.status = 'S'  # Success
             payment.transaction_id = paypal_payment_id
             payment.save()
@@ -780,12 +781,14 @@ def stripe_success(request, payment_id):
         # Check if already processed
         if payment.status == 'S':
             # Already processed, just redirect
+            payment.order.status = 'C'
             messages.success(request, 'Payment completed successfully!')
             return redirect('payment_success', order_id=payment.order.id)  # Use URL name
 
         if not session_id or session_id == '{CHECKOUT_SESSION_ID}':
             # No session_id means user came directly to success URL
             # Mark as paid anyway (Stripe webhook will confirm)
+            payment.order.status = 'C'
             payment.status = 'S'
             payment.transaction_id = 'stripe_redirect'
             payment.save()
@@ -806,6 +809,7 @@ def stripe_success(request, payment_id):
         
             # Check payment status
             if session.payment_status in ['paid', 'no_payment_required']:
+                payment.order.status = 'C'
                 payment.status = 'S'
                 payment.transaction_id = session.id
                 payment.save()
@@ -829,6 +833,7 @@ def stripe_success(request, payment_id):
         
         except stripe.error.InvalidRequestError:
             # Session retrieval failed, but mark as paid
+            payment.order.status = 'C'
             payment.status = 'S'
             payment.transaction_id = 'stripe_fallback'
             payment.save()
@@ -883,6 +888,7 @@ def stripe_webhook(request):
                 
                 # Check if already processed
                 if payment.status != 'S':
+                    payment.order.status = 'C'
                     payment.status = 'S'
                     payment.method = 'ST'
                     payment.transaction_id = session.id
