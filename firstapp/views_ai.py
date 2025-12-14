@@ -111,7 +111,7 @@ def chat_api(request):
             })
         
         # Initialize Gemini model
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Prepare the full prompt with system instructions
         full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\n\nAssistant:"
