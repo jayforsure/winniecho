@@ -59,8 +59,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'firstproject.wsgi.application'
 
-# Database
-if os.getenv('USE_RDS', 'False') == 'True':
+
+USE_RDS = os.getenv('USE_RDS', 'False') == 'True'
+if not USE_RDS:
+    # LOCAL DEVELOPMENT
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAMEl'),
+            'USER': os.getenv('DB_USERl'),
+            'PASSWORD': os.getenv('DB_PASSWORDl'),
+            'HOST': os.getenv('DB_HOSTl'),
+            'PORT': os.getenv('DB_PORTl'),
+            'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        },
+        }
+    }
+else:
+    # AWS RDS (PRODUCTION)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -68,21 +85,10 @@ if os.getenv('USE_RDS', 'False') == 'True':
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT', '3306'),
+            'PORT': os.getenv('DB_PORT'),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'winnie',
-            'USER': os.getenv('DB_USER', 'root'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': 'localhost',
-            'PORT': '3306',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        },
         }
     }
 
@@ -102,7 +108,6 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
