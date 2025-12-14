@@ -6,8 +6,7 @@ from . import views
 from django.http import HttpResponse
 
 urlpatterns = [
-    path("health/", views.health, name='health'),
-    
+    path("health/", views.health, name='healh'),
     # Public pages
     path('', views.home, name='home'),
     path('products/', views.products, name='products'),
