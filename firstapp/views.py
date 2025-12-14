@@ -27,6 +27,9 @@ from .models import (
     Cart, CartItem, Order, OrderItem, Payment, PasswordResetToken
 )
 
+def health(request):
+    return HttpResponse("ok")
+
 # Configure PayPal
 paypalrestsdk.configure({
     "mode": settings.PAYPAL_MODE,  # "sandbox" or "live"
