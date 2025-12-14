@@ -20,6 +20,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
     '10.0.2.120',
+    '10.0.1.248',
     '127.0.0.1',
     'localhost',
     '.elb.amazonaws.com',
