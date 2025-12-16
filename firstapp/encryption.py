@@ -3,32 +3,26 @@ import base64
 from django.conf import settings
 
 def encrypt_secret(plaintext):
-    """Encrypt sensitive data using KMS"""
+    """Encrypt sensitive data using AWS KMS (IAM Role based)"""
     kms = boto3.client(
-        'kms',
-        region_name=settings.AWS_REGION,
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        "kms",
+        region_name="us-east-1"  # or your region
     )
-    
+
     response = kms.encrypt(
-        KeyId=settings.KMS_KEY_ID,
+        KeyId="YOUR_KMS_KEY_ID",
         Plaintext=plaintext.encode()
     )
-    
-    return base64.b64encode(response['CiphertextBlob']).decode()
+
+    return base64.b64encode(response["CiphertextBlob"]).decode()
+
 
 def decrypt_secret(ciphertext):
-    """Decrypt sensitive data using KMS"""
-    kms = boto3.client(
-        'kms',
-        region_name=settings.AWS_REGION,
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-    )
-    
+    """Decrypt sensitive data using AWS KMS (IAM Role based)"""
+    kms = boto3.client("kms", region_name=settings.AWS_REGION)
+
     response = kms.decrypt(
         CiphertextBlob=base64.b64decode(ciphertext.encode())
     )
-    
-    return response['Plaintext'].decode()
+
+    return response["Plaintext"].decode()
