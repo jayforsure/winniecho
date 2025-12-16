@@ -21,6 +21,9 @@ from social_core.exceptions import MissingBackend
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+import boto3
+from PIL import Image
+import io
 
 from .models import (
     User, Member, Address, Product, ProductCategory,
@@ -1473,3 +1476,64 @@ def admin_dashboard(request):
         'low_stock': low_stock,
     }
     return render(request, 'account/admin_dashboard.html', context)
+
+
+def lambda_handler(event, context):
+    # Get S3 object
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = event['Records'][0]['s3']['object']['key']
+    
+    s3 = boto3.client('s3')
+    
+    # Download image
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    img = Image.open(obj['Body'])
+    
+    # Resize to 800x800
+    img.thumbnail((800, 800), Image.Resampling.LANCZOS)
+    
+    # Compress
+    buffer = io.BytesIO()
+    img.save(buffer, format='JPEG', quality=85, optimize=True)
+    buffer.seek(0)
+    
+    # Upload compressed version
+    new_key = key.replace('/original/', '/compressed/')
+    s3.put_object(
+        Bucket=bucket,
+        Key=new_key,
+        Body=buffer,
+        ContentType='image/jpeg',
+        ACL='public-read'
+    )
+    
+    return {
+        'statusCode': 200,
+        'body': f'Processed {key}'
+    }
+
+def lambda_handler(event, context):
+    # Parse order data
+    order = json.loads(event['body'])
+    
+    # Send SNS notification
+    sns = boto3.client('sns')
+    sns.publish(
+        TopicArn='arn:aws:sns:us-east-1:123456789:WinnieChO-Notifications',
+        Subject=f"Order Confirmation #{order['id']}",
+        Message=f"""
+        Thank you for your order!
+        
+        Order ID: {order['id']}
+        Total: ${order['total']}
+        
+        We'll send your chocolates soon!
+        
+        - WinnieChO Team
+        """
+    )
+    
+    return {
+        'statusCode': 200,
+        'body': 'Order confirmation sent'
+    }
