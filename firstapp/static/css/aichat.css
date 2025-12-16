@@ -1,26 +1,49 @@
-/* ===================================
-   WinnieChO AI Chat - Chocolate Modern Japanese Theme
-   Matching Dashboard & Product Design
-   =================================== */
+/* ============================================
+   AI CHAT - Japanese Modern Minimalist
+   Matches Products & Dashboard Aesthetic
+   Clean, Refined, No Flash
+   ============================================ */
 
 :root {
-    /* Chocolate Color Palette */
-    --chocolate-dark: #3E2723;        /* Rich dark chocolate */
-    --chocolate-medium: #5D4037;      /* Milk chocolate */
-    --chocolate-light: #795548;       /* Light chocolate accent */
-    --cream: #FFF8E1;                 /* Cream background */
-    --warm-white: #FFFBF0;            /* Warm white */
-    --gold: #D4AF37;                  /* Gold accent */
-    --soft-brown: #A1887F;            /* Soft brown */
-    --text-dark: #2C2416;             /* Dark text */
-    --text-light: #6D5D4B;            /* Light text */
-    --border-subtle: #EFEBE9;         /* Subtle borders */
-    --shadow: rgba(62, 39, 35, 0.1);  /* Chocolate shadow */
+    /* Japanese-inspired Color Palette (SAME AS PRODUCTS/DASHBOARD) */
+    --ink: #2b2b2b;
+    --charcoal: #4a4a4a;
+    --ash: #8a8a8a;
+    --mist: #d4d4d4;
+    --paper: #fafaf8;
+    --cream: #f5f5f0;
+    --sand: #e8e6e0;
+    
+    /* Accent Colors (Muted) */
+    --gold: #b8956a;
+    --copper: #a67c52;
+    --green: #7a9479;
+    --red: #b85c5c;
+    
+    /* Shadows (Subtle) */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+    
+    /* Typography */
+    --font-primary: 'Noto Sans', -apple-system, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    
+    /* Spacing */
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 64px;
+    
+    /* Transitions */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ===================================
-   FULL SCREEN LAYOUT
-   =================================== */
+/* ============================================
+   FULL SCREEN LAYOUT (Minimal)
+   ============================================ */
 
 .ai-chat-section {
     position: fixed;
@@ -28,190 +51,157 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
+    background: var(--cream);
     margin: 0;
     padding: 0;
     z-index: 1000;
-    font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+    font-family: var(--font-primary);
 }
 
-/* Subtle pattern overlay */
+/* NO PATTERN - Keep it clean like products page */
 .ai-pattern {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(212, 175, 55, 0.02) 2px, rgba(212, 175, 55, 0.02) 4px);
-    pointer-events: none;
-    z-index: 1;
+    display: none;
 }
 
 .ai-chat-container {
-    position: relative;
-    z-index: 2;
     height: 100vh;
     display: grid;
-    grid-template-columns: 340px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 0;
-    background: transparent;
+    background: var(--cream);
 }
 
-/* ===================================
-   SIDEBAR - CHOCOLATE THEME
-   =================================== */
+/* ============================================
+   SIDEBAR (EXACTLY LIKE PRODUCTS SIDEBAR)
+   ============================================ */
 
 .ai-sidebar {
-    background: linear-gradient(180deg, var(--warm-white) 0%, var(--cream) 100%);
-    border-right: 2px solid var(--chocolate-medium);
+    background: var(--paper);
+    border-right: 1px solid var(--sand);
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 4px 0 20px var(--shadow);
+    box-shadow: var(--shadow-xs);
 }
 
-/* Header with Chocolate Brand */
+/* Header - Minimal (like dashboard nav) */
 .sidebar-header {
-    padding: 2.5rem 2rem;
-    background: linear-gradient(135deg, var(--chocolate-dark) 0%, var(--chocolate-medium) 100%);
-    border-bottom: 3px solid var(--gold);
-    position: relative;
-    overflow: hidden;
+    padding: var(--space-md);
+    background: var(--paper);
+    border-bottom: 1px solid var(--sand);
 }
 
-.sidebar-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-    animation: subtleGlow 8s ease-in-out infinite;
-}
-
-@keyframes subtleGlow {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.1); }
-}
-
-/* Chocolate Drop Avatar */
+/* Simple Dot Avatar (NO gradients, NO animations) */
 .ai-avatar {
-    width: 56px;
-    height: 56px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold) 0%, #FFD700 100%);
+    background: var(--ink);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    margin-bottom: 12px;
 }
 
 .ai-avatar svg {
-    color: var(--chocolate-dark);
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    color: var(--gold);
+    width: 16px;
+    height: 16px;
 }
 
-.ai-avatar::before {
-    content: '';
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
+/* NO ::before pseudo-element animations */
 
 .sidebar-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--warm-white);
-    letter-spacing: -0.5px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: 0.2px;
     margin: 0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .sidebar-header p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 0.5rem;
-    letter-spacing: 0.3px;
+    font-size: 11px;
+    color: var(--ash);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* ===================================
-   PROMPT SUGGESTIONS - CHOCOLATE CARDS
-   =================================== */
+/* ============================================
+   PROMPTS SECTION (Like Products Navigation)
+   ============================================ */
 
 .prompts-section {
-    padding: 2rem;
+    padding: var(--space-md);
     flex-shrink: 0;
 }
 
 .prompts-section h3 {
-    font-size: 0.75rem;
+    font-size: 11px;
     font-weight: 600;
-    color: var(--chocolate-medium);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    color: var(--charcoal);
+    margin-bottom: 12px;
+}
+
+/* Divider (SAME AS PRODUCTS) */
+.nav-divider-jp {
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    margin-bottom: var(--space-md);
 }
 
 .prompt-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
+/* Simple Buttons (NO fancy hover effects) */
 .prompt-btn {
-    padding: 1rem;
-    background: var(--warm-white);
-    border: 2px solid var(--border-subtle);
-    border-radius: 12px;
-    font-size: 0.875rem;
-    color: var(--text-dark);
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-weight: 500;
+    gap: 10px;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid var(--sand);
+    font-size: 13px;
+    color: var(--charcoal);
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-primary);
 }
 
 .prompt-btn svg {
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
-    color: var(--chocolate-medium);
-    transition: transform 0.3s ease;
+    color: var(--ash);
+    stroke-width: 1.5;
 }
 
 .prompt-btn:hover {
-    border-color: var(--chocolate-medium);
-    background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
-    transform: translateX(8px);
-    box-shadow: 0 4px 12px var(--shadow);
+    background: var(--cream);
+    border-color: var(--mist);
+    color: var(--ink);
+    padding-left: 16px;
 }
 
 .prompt-btn:hover svg {
-    transform: rotate(12deg);
-    color: var(--gold);
+    color: var(--copper);
 }
 
-/* ===================================
-   CHAT HISTORY - CHOCOLATE LIST
-   =================================== */
+/* ============================================
+   CHAT HISTORY (Minimal List)
+   ============================================ */
 
 .history-section {
     flex: 1;
-    padding: 1.5rem 2rem;
+    padding: var(--space-md);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -221,85 +211,83 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 12px;
 }
 
 .history-header h3 {
-    font-size: 0.75rem;
+    font-size: 11px;
     font-weight: 600;
-    color: var(--chocolate-medium);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
+    color: var(--charcoal);
     margin: 0;
 }
 
 .clear-history {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--text-light);
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ash);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    padding: 4px 8px;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clear-history svg {
+    width: 12px;
+    height: 12px;
 }
 
 .clear-history:hover {
-    color: var(--chocolate-dark);
-    background: var(--border-subtle);
+    color: var(--red);
 }
 
 .history-list {
     flex: 1;
     overflow-y: auto;
-    padding-right: 0.5rem;
 }
 
 .history-item {
-    padding: 0.875rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    background: var(--warm-white);
-    border: 1px solid var(--border-subtle);
-    font-size: 0.875rem;
-    color: var(--text-dark);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--sand);
+    font-size: 13px;
+    color: var(--charcoal);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .history-item:hover {
-    background: var(--cream);
-    border-color: var(--chocolate-light);
-    transform: translateX(4px);
+    color: var(--copper);
+    padding-left: 4px;
 }
 
-/* ===================================
-   SIDEBAR FOOTER
-   =================================== */
+/* ============================================
+   SIDEBAR FOOTER (Like Products Footer)
+   ============================================ */
 
 .sidebar-footer {
-    padding: 2rem;
-    border-top: 2px solid var(--border-subtle);
-    background: var(--warm-white);
+    padding: var(--space-md);
+    border-top: 1px solid var(--sand);
+    background: var(--paper);
 }
 
 .usage-info {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-md);
 }
 
 .usage-bar {
-    height: 4px;
-    background: var(--border-subtle);
-    border-radius: 2px;
-    margin-bottom: 0.75rem;
+    height: 2px;
+    background: var(--sand);
+    margin-bottom: 8px;
     position: relative;
-    overflow: hidden;
 }
 
 .usage-fill {
@@ -308,134 +296,124 @@
     left: 0;
     height: 100%;
     width: 30%;
-    background: linear-gradient(90deg, var(--chocolate-medium) 0%, var(--gold) 100%);
-    border-radius: 2px;
-    transition: width 0.5s ease;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+    background: var(--copper);
+    transition: width 0.3s ease;
 }
 
 .usage-text {
-    font-size: 0.75rem;
-    color: var(--text-light);
-    font-weight: 500;
+    font-size: 11px;
+    color: var(--ash);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .back-to-dashboard {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border: 2px solid var(--chocolate-medium);
-    background: var(--warm-white);
-    color: var(--chocolate-dark);
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--sand);
+    background: transparent;
+    color: var(--charcoal);
     text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.back-to-dashboard svg {
+    width: 14px;
+    height: 14px;
 }
 
 .back-to-dashboard:hover {
-    background: var(--chocolate-dark);
-    color: var(--warm-white);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow);
+    background: var(--cream);
+    color: var(--copper);
+    border-color: var(--copper);
 }
 
-/* ===================================
-   MAIN CHAT AREA - CHOCOLATE THEME
-   =================================== */
+/* ============================================
+   MAIN CHAT AREA (Clean)
+   ============================================ */
 
 .ai-chat-main {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: transparent;
+    background: var(--cream);
 }
 
-/* Chat Header */
+/* Chat Header (Minimal) */
 .chat-header {
-    padding: 2rem 2.5rem;
-    background: var(--warm-white);
-    border-bottom: 2px solid var(--chocolate-medium);
-    box-shadow: 0 2px 8px var(--shadow);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--paper);
+    border-bottom: 1px solid var(--sand);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .chat-title h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--chocolate-dark) 0%, var(--chocolate-medium) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.5px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
 }
 
 .chat-title p {
-    font-size: 0.9375rem;
-    color: var(--text-light);
+    font-size: 13px;
+    color: var(--ash);
     margin: 0;
 }
 
 .chat-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
 }
 
 .status-indicator {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    padding: 0.625rem 1rem;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
-    border-radius: 20px;
-    font-size: 0.8125rem;
-    color: var(--text-dark);
-    font-weight: 500;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--charcoal);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Simple Dot (NO animation) */
 .status-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--gold);
+    width: 6px;
+    height: 6px;
+    background: var(--copper);
     border-radius: 50%;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
-    animation: statusPulse 2s ease-in-out infinite;
 }
 
-@keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* ===================================
-   MESSAGES CONTAINER
-   =================================== */
+/* ============================================
+   MESSAGES CONTAINER (Minimal)
+   ============================================ */
 
 .chat-messages {
     flex: 1;
-    padding: 2.5rem;
+    padding: var(--space-lg);
     overflow-y: auto;
-    background: transparent;
+    background: var(--cream);
 }
 
 .message-wrapper {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 12px;
+    margin-bottom: var(--space-md);
+    animation: fadeIn 0.3s ease;
 }
 
-@keyframes messageSlide {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -443,168 +421,164 @@
     }
 }
 
-/* Message Avatars - Chocolate Drops */
+/* Simple Circle Avatars (NO gradients) */
 .message-avatar {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 0.25rem;
-    box-shadow: 0 2px 8px var(--shadow);
+    margin-top: 4px;
 }
 
 .ai-message .message-avatar {
-    background: linear-gradient(135deg, var(--chocolate-dark) 0%, var(--chocolate-medium) 100%);
+    background: var(--ink);
 }
 
 .ai-message .message-avatar svg {
     color: var(--gold);
+    width: 14px;
+    height: 14px;
 }
 
 .user-message .message-avatar {
-    background: linear-gradient(135deg, var(--gold) 0%, #FFD700 100%);
+    background: var(--copper);
 }
 
 .user-message .message-avatar svg {
-    color: var(--chocolate-dark);
+    color: var(--paper);
+    width: 14px;
+    height: 14px;
 }
 
 .message-content {
     flex: 1;
-    max-width: 75%;
-}
-
-.user-message .message-content {
-    margin-left: auto;
+    max-width: 70%;
 }
 
 .message-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 0.75rem;
+    margin-bottom: 8px;
 }
 
 .sender-name {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--chocolate-dark);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .message-time {
-    font-size: 0.75rem;
-    color: var(--text-light);
+    font-size: 11px;
+    color: var(--ash);
 }
 
-/* Message Bubbles - Chocolate Cards */
+/* Message Bubbles (Like Product Cards) */
 .message-text {
-    font-size: 1rem;
+    font-size: 14px;
     line-height: 1.7;
-    color: var(--text-dark);
-    background: var(--warm-white);
-    padding: 1.25rem 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px var(--shadow);
+    color: var(--ink);
+    background: var(--paper);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--sand);
     position: relative;
 }
 
 .ai-message .message-text {
-    border: 2px solid var(--chocolate-medium);
-    border-left: 4px solid var(--chocolate-dark);
+    border-left: 2px solid var(--copper);
 }
 
 .user-message .message-text {
-    border: 2px solid var(--gold);
-    border-right: 4px solid var(--gold);
-    background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
+    border-right: 2px solid var(--copper);
 }
 
-/* Welcome Message - Premium Chocolate Box */
+/* Welcome Message (Clean) */
 .welcome-message .message-text {
-    background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
-    border: 3px solid var(--chocolate-medium);
-    box-shadow: 0 4px 16px var(--shadow);
+    background: var(--paper);
+    border: 1px solid var(--sand);
 }
 
 .welcome-message h3 {
-    font-size: 1.375rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--chocolate-dark) 0%, var(--chocolate-medium) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 1rem;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 12px;
+    letter-spacing: -0.2px;
 }
 
 .welcome-message ul {
     list-style: none;
     padding: 0;
-    margin: 1rem 0;
+    margin: 12px 0;
 }
 
 .welcome-message li {
-    padding: 0.5rem 0;
-    padding-left: 1.5rem;
-    font-size: 0.9375rem;
-    color: var(--text-dark);
+    padding: 6px 0;
+    padding-left: 16px;
+    font-size: 13px;
+    color: var(--charcoal);
     position: relative;
 }
 
+/* Simple Dot Bullets */
 .welcome-message li::before {
-    content: '🍫';
+    content: '';
     position: absolute;
     left: 0;
-    font-size: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--copper);
+    border-radius: 50%;
 }
 
-/* ===================================
-   TYPING INDICATOR - ANIMATED
-   =================================== */
+/* ============================================
+   TYPING INDICATOR (Minimal)
+   ============================================ */
 
 .typing-indicator {
     display: flex;
     gap: 6px;
-    padding: 1.25rem 1.5rem;
-    background: var(--warm-white);
-    border: 2px solid var(--chocolate-medium);
-    border-radius: 16px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--paper);
+    border: 1px solid var(--sand);
 }
 
 .typing-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--chocolate-medium);
+    width: 6px;
+    height: 6px;
+    background: var(--ash);
     border-radius: 50%;
-    animation: typingBounce 1.4s infinite ease-in-out;
+    animation: typing 1.4s infinite ease-in-out;
 }
 
 .typing-dot:nth-child(1) { animation-delay: -0.32s; }
 .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-.typing-dot:nth-child(3) { animation-delay: 0s; }
 
-@keyframes typingBounce {
+@keyframes typing {
     0%, 80%, 100% { 
-        transform: translateY(0) scale(0.8); 
-        opacity: 0.5; 
+        opacity: 0.3;
     }
     40% { 
-        transform: translateY(-8px) scale(1); 
-        opacity: 1; 
+        opacity: 1;
     }
 }
 
-/* ===================================
-   INPUT AREA - CHOCOLATE TEXTBOX
-   =================================== */
+/* ============================================
+   INPUT AREA (Clean)
+   ============================================ */
 
 .chat-input-area {
-    padding: 2rem 2.5rem;
-    background: var(--warm-white);
-    border-top: 2px solid var(--chocolate-medium);
-    box-shadow: 0 -2px 8px var(--shadow);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--paper);
+    border-top: 1px solid var(--sand);
 }
 
 .chat-form {
@@ -613,150 +587,193 @@
 
 .input-wrapper {
     display: flex;
-    gap: 1rem;
+    gap: 12px;
     align-items: flex-end;
 }
 
 textarea#messageInput {
     flex: 1;
-    min-height: 54px;
-    max-height: 150px;
-    padding: 1rem 1.25rem;
-    font-size: 1rem;
-    font-family: inherit;
-    border: 2px solid var(--chocolate-light);
-    background: var(--cream);
-    color: var(--text-dark);
+    min-height: 48px;
+    max-height: 120px;
+    padding: 12px var(--space-sm);
+    font-size: 14px;
+    font-family: var(--font-primary);
+    border: 1px solid var(--sand);
+    background: white;
+    color: var(--ink);
     resize: none;
     line-height: 1.6;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 textarea#messageInput:focus {
     outline: none;
-    border-color: var(--chocolate-dark);
-    background: var(--warm-white);
-    box-shadow: 0 0 0 3px rgba(62, 39, 35, 0.1);
+    border-color: var(--copper);
+    box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
 }
 
 textarea#messageInput::placeholder {
-    color: var(--text-light);
+    color: var(--ash);
 }
 
 .input-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 8px;
     align-items: flex-end;
 }
 
 .input-btn,
 .send-btn {
-    width: 54px;
-    height: 54px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--chocolate-medium);
-    background: var(--warm-white);
+    border: 1px solid var(--sand);
+    background: white;
     cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    transition: var(--transition);
+}
+
+.input-btn svg,
+.send-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.5;
 }
 
 .input-btn:hover {
-    border-color: var(--chocolate-dark);
     background: var(--cream);
-    transform: translateY(-2px);
+    border-color: var(--mist);
 }
 
 .send-btn {
-    background: linear-gradient(135deg, var(--chocolate-dark) 0%, var(--chocolate-medium) 100%);
-    border-color: var(--chocolate-dark);
-    color: var(--warm-white);
-    box-shadow: 0 4px 12px var(--shadow);
+    background: var(--copper);
+    border-color: var(--copper);
+    color: white;
+}
+
+.send-btn svg {
+    stroke: white;
 }
 
 .send-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--chocolate-medium) 0%, var(--chocolate-light) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px var(--shadow);
+    background: var(--ink);
+    border-color: var(--ink);
 }
 
 .send-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
-    transform: none;
 }
 
 .input-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
+    margin-top: 12px;
 }
 
 .char-count {
-    font-size: 0.8125rem;
-    color: var(--text-light);
-    font-weight: 500;
+    font-size: 11px;
+    color: var(--ash);
 }
 
 .input-hint {
-    font-size: 0.8125rem;
-    color: var(--text-light);
+    font-size: 11px;
+    color: var(--ash);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
+}
+
+.input-hint svg {
+    width: 12px;
+    height: 12px;
 }
 
 .input-hint kbd {
-    padding: 0.25rem 0.5rem;
+    padding: 2px 6px;
     background: var(--cream);
-    border: 1px solid var(--chocolate-light);
-    border-radius: 4px;
-    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 0.75rem;
+    border: 1px solid var(--sand);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
 }
 
-/* ===================================
-   SCROLLBAR STYLING
-   =================================== */
+/* ============================================
+   SCROLLBAR (Minimal)
+   ============================================ */
 
 .chat-messages::-webkit-scrollbar,
 .history-list::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
 }
 
 .chat-messages::-webkit-scrollbar-track,
 .history-list::-webkit-scrollbar-track {
-    background: var(--border-subtle);
-    border-radius: 4px;
+    background: transparent;
 }
 
 .chat-messages::-webkit-scrollbar-thumb,
 .history-list::-webkit-scrollbar-thumb {
-    background: var(--chocolate-light);
-    border-radius: 4px;
-    transition: background 0.2s ease;
+    background: var(--sand);
 }
 
-.chat-messages::-webkit-scrollbar-thumb:hover,
-.history-list::-webkit-scrollbar-thumb:hover {
-    background: var(--chocolate-medium);
+/* ============================================
+   TOAST (Same as Dashboard)
+   ============================================ */
+
+.toast-container-jp {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* ===================================
-   RESPONSIVE DESIGN
-   =================================== */
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px var(--space-sm);
+    background: white;
+    border: 1px solid var(--sand);
+    box-shadow: var(--shadow-md);
+    font-size: 13px;
+    min-width: 320px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: var(--transition);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-success {
+    border-left: 3px solid var(--green);
+}
+
+.toast-error {
+    border-left: 3px solid var(--red);
+}
+
+.toast svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 
 @media (max-width: 1024px) {
     .ai-chat-container {
-        grid-template-columns: 300px 1fr;
-    }
-    
-    .message-content {
-        max-width: 80%;
+        grid-template-columns: 240px 1fr;
     }
 }
 
@@ -772,38 +789,67 @@ textarea#messageInput::placeholder {
     .chat-header,
     .chat-messages,
     .chat-input-area {
-        padding: 1.5rem;
-    }
-    
-    .message-content {
-        max-width: 90%;
+        padding: var(--space-sm);
     }
     
     .chat-title h1 {
-        font-size: 1.5rem;
+        font-size: 18px;
+    }
+    
+    .message-content {
+        max-width: 85%;
     }
 }
 
-/* ===================================
-   LOADING & ERROR STATES
-   =================================== */
+@media (max-width: 480px) {
+    .chat-title h1 {
+        font-size: 16px;
+    }
+    
+    .message-text {
+        font-size: 13px;
+    }
+}
+
+/* ============================================
+   LOADING STATE (Minimal)
+   ============================================ */
 
 .loading-spinner {
     display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid var(--border-subtle);
-    border-top-color: var(--chocolate-dark);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--sand);
+    border-top-color: var(--copper);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
+/* ============================================
+   ERROR STATE (Minimal)
+   ============================================ */
+
 .error-message {
-    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
-    border: 2px solid #E53935;
-    color: #C62828;
+    background: rgba(184, 92, 92, 0.05);
+    border: 1px solid var(--sand);
+    border-left: 2px solid var(--red);
+    color: var(--red);
 }
+
+/* ============================================
+   REMOVE ALL FLASHY EFFECTS
+   ============================================ */
+
+/* NO box-shadow animations */
+/* NO transform scale animations */
+/* NO gradient backgrounds */
+/* NO pulse effects */
+/* NO glow effects */
+/* NO fancy transitions beyond basic 0.3s ease */
+
+/* Keep everything FLAT, MINIMAL, REFINED */
+/* Like Japanese paper, ink, and simplicity */
