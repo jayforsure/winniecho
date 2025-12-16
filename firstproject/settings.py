@@ -73,6 +73,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'firstproject.wsgi.application'
 
+# KMS Configuration
+KMS_KEY_ID = os.getenv('KMS_KEY_ID')
+
+# Use encrypted database password
+ENCRYPTED_DB_PASSWORD = os.getenv('ENCRYPTED_DB_PASSWORD')
+
+if ENCRYPTED_DB_PASSWORD:
+    from firstapp.encryption import decrypt_secret
+    DB_PASSWORD = decrypt_secret(ENCRYPTED_DB_PASSWORD)
+else:
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 USE_RDS = os.getenv('USE_RDS', 'False') == 'True'
 if not USE_RDS:
@@ -87,7 +98,8 @@ if not USE_RDS:
             'PORT': os.getenv('DB_PORTl'),
             'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        },
+            },
+            'PASSWORD': DB_PASSWORD,
         }
     }
 else:
@@ -102,7 +114,8 @@ else:
             'PORT': os.getenv('DB_PORT'),
             'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        },
+            },
+            'PASSWORD': DB_PASSWORD,
         }
     }
 
@@ -124,7 +137,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-
 # S3 Configuration - NO KEYS NEEDED!
 USE_S3 = os.getenv('USE_S3', 'False') == 'True'
 
@@ -141,7 +153,6 @@ if USE_S3:
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
