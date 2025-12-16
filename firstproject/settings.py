@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 import google.generativeai as genai
 from dotenv import load_dotenv
-
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
 # Load environment variables
 load_dotenv()
