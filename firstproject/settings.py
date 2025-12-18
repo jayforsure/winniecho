@@ -1,6 +1,6 @@
 """
-Django settings for chocolate_ordering_system project.
-PRODUCTION CONFIGURATION FOR AWS DEPLOYMENT WITH S3
+Django settings for WinnieChO project.
+PRODUCTION CONFIGURATION FOR AWS DEPLOYMENT WITH ALB
 """
 import os
 from pathlib import Path
@@ -17,14 +17,14 @@ AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-fallback-secret-key')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# ✅ FIXED: ALLOWED_HOSTS for ALB
 ALLOWED_HOSTS = [
-    '10.0.2.120',
-    '10.0.1.248',
-    '127.0.0.1',
-    '54.209.180.169',
-    'localhost',
-    '.elb.amazonaws.com',
+    '*',  # Allow all for ALB (ALB uses dynamic IPs)
 ]
+
+# ✅ BETTER: Use X-Forwarded-Host header from ALB
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 INSTALLED_APPS = [
@@ -36,12 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'firstapp',
-    'storages',  # ✅ For S3
+    'storages',
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ Move after security
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -70,20 +70,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'firstproject.wsgi.application'
 
-# Database Configuration
+# ============================================================
+# DATABASE CONFIGURATION
+# ============================================================
+
 USE_RDS = os.getenv('USE_RDS', 'False') == 'True'
+
 if not USE_RDS:
     # LOCAL DEVELOPMENT
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAMEl'),
-            'USER': os.getenv('DB_USERl'),
-            'PASSWORD': os.getenv('DB_PASSWORDl'),
-            'HOST': os.getenv('DB_HOSTl'),
-            'PORT': os.getenv('DB_PORTl'),
+            'NAME': os.getenv('DB_NAMEl', 'winniecho'),
+            'USER': os.getenv('DB_USERl', 'root'),
+            'PASSWORD': os.getenv('DB_PASSWORDl', ''),
+            'HOST': os.getenv('DB_HOSTl', 'localhost'),
+            'PORT': os.getenv('DB_PORTl', '3306'),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
             },
         }
     }
@@ -92,14 +97,18 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
+            'NAME': os.getenv('DB_NAME', 'winniecho'),
+            'USER': os.getenv('DB_USER', 'admin'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
+            'PORT': os.getenv('DB_PORT', '3306'),
             'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+                'connect_timeout': 10,  # ✅ Add connection timeout
             },
+            # ✅ Connection pooling
+            'CONN_MAX_AGE': 60,
         }
     }
 
@@ -117,42 +126,38 @@ TIME_ZONE = 'Asia/Kuala_Lumpur'
 USE_I18N = True
 USE_TZ = True
 
-# =============================================
-# S3 CONFIGURATION FOR PRODUCT IMAGES
-# =============================================
+# ============================================================
+# S3 CONFIGURATION
+# ============================================================
 
 USE_S3 = os.getenv('USE_S3', 'False') == 'True'
 
 if USE_S3:
-    # ✅ S3 bucket for PRODUCT IMAGES (user uploads)
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'winniecho-media')
     AWS_S3_REGION_NAME = AWS_REGION
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     
-    # ✅ NO ACCESS KEYS NEEDED - Uses EC2 Instance Profile (LabInstanceProfile)
+    # Uses EC2 Instance Profile (no keys needed)
     AWS_ACCESS_KEY_ID = None
     AWS_SECRET_ACCESS_KEY = None
     
-    # S3 Settings
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
     }
-    AWS_DEFAULT_ACL = 'public-read'  # Make uploaded images public
-    AWS_QUERYSTRING_AUTH = False  # Don't add auth parameters to URLs
-    AWS_LOCATION = 'media'  # Folder in bucket for uploads
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_QUERYSTRING_AUTH = False
+    AWS_LOCATION = 'media'
     
-    # Use S3 for media files (product images)
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 else:
-    # Local storage for development
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# =============================================
-# STATIC FILES (CSS/JS/Images in templates)
-# =============================================
-# Keep static files local (served by whitenoise)
+# ============================================================
+# STATIC FILES
+# ============================================================
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
@@ -162,9 +167,9 @@ STATICFILES_DIRS = [
 # Whitenoise for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# =============================================
+# ============================================================
 # AUTHENTICATION
-# =============================================
+# ============================================================
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
@@ -198,48 +203,45 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-# =============================================
+# ============================================================
 # PAYMENT GATEWAYS
-# =============================================
+# ============================================================
 
-# PayPal
 PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
 PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
 PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
 
-# Stripe
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
-# =============================================
+# ============================================================
 # EMAIL & NOTIFICATIONS
-# =============================================
+# ============================================================
 
 ADMIN_EMAIL = 'winniechoofficial@gmail.com'
 USE_SNS_NOTIFICATIONS = True
 
-# Site URL (for links in emails)
-SITE_URL = 'http://winniecho-alb-1199297198.us-east-1.elb.amazonaws.com'
+# ✅ Use ALB DNS for site URL
+SITE_URL = os.getenv('SITE_URL', 'http://winniecho-alb-1199297198.us-east-1.elb.amazonaws.com')
 
-# SNS Configuration
 AWS_SNS_REGION_NAME = AWS_REGION
-AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:049585066686:winniecho-alerts'
+AWS_SNS_TOPIC_ARN = os.getenv('AWS_SNS_TOPIC_ARN', 'arn:aws:sns:us-east-1:049585066686:winniecho-alerts')
 
 # Email Backend
 if not DEBUG:
     EMAIL_BACKEND = 'firstapp.email_backends.SNSEmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
     EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-# =============================================
+# ============================================================
 # GEMINI AI
-# =============================================
+# ============================================================
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 if GEMINI_API_KEY:
@@ -252,56 +254,129 @@ if GEMINI_API_KEY:
 else:
     GEMINI_AVAILABLE = False
 
-# =============================================
+# ============================================================
 # SECURITY SETTINGS
-# =============================================
+# ============================================================
 
 if not DEBUG:
+    # ✅ Don't force HTTPS (ALB handles it)
     SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False  # ALB terminates SSL
     CSRF_COOKIE_SECURE = False
+    
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    X_FRAME_OPTIONS = 'SAMEORIGIN'  # Allow iframes from same origin
+    
+    # ✅ Don't use HSTS (ALB handles it)
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
 
-# =============================================
-# LOGGING
-# =============================================
+# ✅ CSRF Trusted Origins for ALB
+CSRF_TRUSTED_ORIGINS = [
+    'http://winniecho-alb-1199297198.us-east-1.elb.amazonaws.com',
+    'https://winniecho-alb-1199297198.us-east-1.elb.amazonaws.com',
+]
+
+# ============================================================
+# LOGGING (IMPROVED)
+# ============================================================
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '[{levelname}] {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
             'style': '{',
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django_errors.log',
-            'formatter': 'verbose',
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
         },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/django/django.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/django/error.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'backupCount': 5,
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
+        'django.request': {
+            'handlers': ['error_file', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'firstapp': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
     },
 }
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================================
+# SESSION CONFIGURATION
+# ============================================================
+
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# ============================================================
+# CACHES (OPTIONAL - IMPROVES PERFORMANCE)
+# ============================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
