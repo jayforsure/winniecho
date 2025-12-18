@@ -18,19 +18,27 @@ from django.utils.html import strip_tags
 class User(models.Model):
     """
     Base user model for both members and guests
+    UPDATED: Handles both email/password and Google OAuth users
     """
     type_choices = [
         ('M', 'Member'),
         ('A', 'Admin'),
+        ('D', 'Driver'),
     ]
 
     name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True, db_index=True)
-    password = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
+    
+    # ✅ ALLOW NULL for Google users
+    password = models.CharField(max_length=255, blank=True, default='')
+    phone = models.CharField(max_length=20, blank=True, default='')
+    
     birthday = models.DateField(null=True, blank=True)
     role = models.CharField(max_length=1, choices=type_choices, db_index=True, default='M')
+    
+    # ✅ This IS useful! Marks Google users as verified
     is_email_verified = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -49,8 +57,15 @@ class User(models.Model):
         """Check if user is a member"""
         return self.role == 'M'
     
+    def is_admin(self):
+        """Check if user is admin"""
+        return self.role == 'A'
+    
+    def is_driver(self):
+        return self.role == 'D'
+
     def get_age(self):
-        """Calculate member's age"""
+        """Calculate user's age from birthday"""
         if not self.birthday:
             return None
         today = date.today()
@@ -58,24 +73,17 @@ class User(models.Model):
             (today.month, today.day) < (self.birthday.month, self.birthday.day)
         )
     
-    def is_admin(self):
-        """Check if member is admin"""
-        return self.role == 'A'
+    def is_oauth_user(self):
+        """Check if user logged in via OAuth (Google)"""
+        return self.password == ''
+    
+    def can_change_password(self):
+        """Check if user can change password (not OAuth user)"""
+        return not self.is_oauth_user()
     
     def get_default_address(self):
         """Get user's default address"""
         return self.addresses.filter(is_default=True).first() or self.addresses.first()
-    
-    def send_verification_email(self, token):
-        """Send email verification"""
-        subject = 'Verify Your Email - WinnieCho'
-        verification_url = f"{settings.SITE_URL}/verify-email/{token}/"
-        html_message = render_to_string('emails/email_verification.html', {
-            'user': self,
-            'verification_url': verification_url
-        })
-        plain_message = strip_tags(html_message)
-        send_mail(subject, plain_message, settings.DEFAULT_FROM_EMAIL, [self.email], html_message=html_message)
 
 
 # -----------------------
@@ -325,9 +333,6 @@ class Product(models.Model):
 # Product Image
 # -----------------------
 class ProductImage(models.Model):
-    """
-    Multiple images for each product (max 4)
-    """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
     is_primary = models.BooleanField(default=False)
@@ -336,25 +341,30 @@ class ProductImage(models.Model):
 
     class Meta:
         db_table = 'product_image'
-        verbose_name = 'Product Image'
-        verbose_name_plural = 'Product Images'
         ordering = ['-is_primary', 'order']
 
     def __str__(self):
         return f"Image for {self.product.name}"
-    
-    def save(self, *args, **kwargs):
-        # If this is set as primary, remove primary from others
-        if self.is_primary:
-            ProductImage.objects.filter(product=self.product, is_primary=True).update(is_primary=False)
-        super().save(*args, **kwargs)
-    
+
     def clean(self):
-        # Validate max 4 images per product
-        if not self.pk:  # Only check on creation
-            count = ProductImage.objects.filter(product=self.product).count()
+        # Skip validation if product not saved yet (admin inline case)
+        if not self.product_id:
+            return
+
+        if not self.pk:
+            count = ProductImage.objects.filter(product_id=self.product_id).count()
             if count >= 4:
                 raise ValidationError("Maximum 4 images per product allowed")
+
+    def save(self, *args, **kwargs):
+        if self.product_id and self.is_primary:
+            ProductImage.objects.filter(
+                product_id=self.product_id,
+                is_primary=True
+            ).exclude(pk=self.pk).update(is_primary=False)
+
+        super().save(*args, **kwargs)
+
 
 
 # -----------------------
@@ -542,6 +552,38 @@ class OrderItem(models.Model):
         if not self.product_name:
             self.product_name = self.product.name
         super().save(*args, **kwargs)
+
+
+# -----------------------
+# Delivery Proof
+# -----------------------
+class DeliveryProof(models.Model):
+    """Delivery proof image uploaded by driver"""
+    order = models.OneToOneField(
+        Order, 
+        on_delete=models.CASCADE, 
+        related_name='delivery_proof',
+        primary_key=True
+    )
+    driver = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True,
+        related_name='delivered_orders',
+        limit_choices_to={'role': 'D'}
+    )
+    image = models.ImageField(upload_to='delivery_proofs/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True, default='')
+
+    class Meta:
+        db_table = 'delivery_proof'
+        verbose_name = 'Delivery Proof'
+        verbose_name_plural = 'Delivery Proofs'
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return f"Proof for Order #{self.order.order_number}"
 
 
 # -----------------------

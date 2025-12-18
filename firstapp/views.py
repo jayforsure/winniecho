@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Sum, Count
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils import timezone
+from django.db.models import Sum, Count, Avg, F, Q
+from django.db.models.functions import TruncDate, TruncMonth
 from decimal import Decimal
 import hashlib
 import secrets
@@ -28,7 +29,7 @@ import io
 
 from .models import (
     User, Member, Address, Product, ProductCategory,
-    Cart, CartItem, Order, OrderItem, Payment, PasswordResetToken
+    Cart, CartItem, Order, OrderItem, Payment, PasswordResetToken, DeliveryProof
 )
 
 def health(request):
@@ -210,8 +211,55 @@ def register(request):
     return render(request, 'account/register.html')
 
 
+def create_user_profile(backend, user, response, *args, **kwargs):
+    """
+    Create user profile after Google OAuth login
+    """
+    from .models import User, Member, Cart
+    import secrets
+    
+    # Check if this is a new user
+    if kwargs.get('is_new', False):
+        # Get Google user info
+        request = kwargs.get('request')
+
+        email = response.get('email')
+        name = response.get('name', email.split('@')[0])
+        
+        # Check if user exists in our system
+        try:
+            our_user = User.objects.get(email=email)
+            # User exists, just link the social auth
+        except User.DoesNotExist:
+            # Create new user for Google login
+            our_user = User.objects.create(
+                name=name,
+                email=email,
+                password='',  # ✅ EMPTY for Google users
+                phone='',     # ✅ EMPTY for Google users
+                role='M',     # Default to Member
+                is_email_verified=True  # ✅ Google emails are verified
+            )
+            
+            # Create member profile
+            Member.objects.create(user=our_user)
+            
+            # Create cart
+            Cart.objects.create(user=our_user)
+        
+        # Store in session
+        kwargs['request'].session['user_id'] = our_user.id
+        kwargs['request'].session['user_name'] = our_user.name
+        kwargs['request'].session['user_email'] = our_user.email
+        kwargs['request'].session['user_role'] = our_user.role
+
+        messages.success(request, f'Welcome back, {our_user.name}!')
+    
+    return kwargs
+
+
 def login_view(request):
-    """User login"""
+    """User login with admin detection"""
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -226,10 +274,18 @@ def login_view(request):
             request.session['user_id'] = user.id
             request.session['user_name'] = user.name
             request.session['user_email'] = user.email
+            request.session['user_role'] = user.role  # ✅ ADD THIS
             
             messages.success(request, f'Welcome back, {user.name}!')
             
-            # Redirect to next page or dashboard
+            # ✅ CHECK IF ADMIN - Redirect to admin dashboard
+            if user.is_admin():
+                return redirect('/admin/', {'is_admin': request.user.is_authenticated and request.session['user_role'] == 'A'})
+            
+            if user.is_driver():
+                return redirect('driver_dashboard')
+            
+            # Regular user - redirect to dashboard
             next_url = request.GET.get('next', 'dashboard')
             return redirect(next_url)
             
@@ -425,7 +481,7 @@ def checkout(request):
 
 @require_POST
 def process_checkout(request):
-    """Process checkout and create order - FIXED VERSION"""
+    """Process checkout and create order - WITH ADMIN NOTIFICATION"""
     user = get_user_from_session(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
@@ -434,7 +490,6 @@ def process_checkout(request):
     if not cart or cart.is_empty():
         return JsonResponse({'error': 'Cart is empty'}, status=400)
     
-    # Get selected address ID
     address_id = request.POST.get('address_id')
     
     if not address_id:
@@ -445,12 +500,10 @@ def process_checkout(request):
     except Address.DoesNotExist:
         return JsonResponse({'error': 'Invalid address'}, status=400)
     
-    # Calculate totals
     subtotal = cart.get_subtotal()
     loyalty_points_used = Decimal(request.POST.get('loyalty_points_used', '0'))
     discount_amount = Decimal('0')
     
-    # Validate loyalty points (but DON'T redeem yet)
     if loyalty_points_used > 0:
         if not user.is_member():
             return JsonResponse({'error': 'Not a member'}, status=400)
@@ -461,9 +514,7 @@ def process_checkout(request):
         
         try:
             discount_amount = member.redeem_points(loyalty_points_used)
-            print(f"✅ Deducted {loyalty_points_used} points. New balance: {member.loyalty_points}")
         except Exception as e:
-            print(f"❌ Error deducting points: {e}")
             return JsonResponse({'error': f'Failed to use loyalty points: {str(e)}'}, status=400)
     
     total_amount = subtotal - discount_amount
@@ -472,7 +523,7 @@ def process_checkout(request):
     order = Order.objects.create(
         address=user_address,
         subtotal=subtotal,
-        status='X',
+        status='P',  # Pending
         loyalty_points_used=loyalty_points_used
     )
     
@@ -485,18 +536,25 @@ def process_checkout(request):
             unit_price=cart_item.product.price,
             subtotal=cart_item.get_total_price()
         )
-        
-        # Reduce stock
         cart_item.product.reduce_stock(cart_item.quantity)
+    
+    # Create pending payment record
+    Payment.objects.create(
+        order=order,
+        discount_amount=discount_amount,
+        total_amount=total_amount,
+        method='COD',  # Temporary
+        status='P'
+    )
+    
+    # ✅ SEND ADMIN NOTIFICATION (NEW!)
+    send_admin_notification(order)
     
     # Store order in session
     request.session['pending_order_id'] = order.id
     request.session['pending_order_total'] = float(total_amount)
     request.session['pending_order_discount'] = float(discount_amount)
     request.session['loyalty_points_to_redeem'] = float(loyalty_points_used)
-    
-    # IMPORTANT: DON'T clear cart here - only clear after successful payment
-    # cart.clear()  # REMOVED THIS LINE
     
     return JsonResponse({
         'success': True,
@@ -1262,10 +1320,16 @@ def delete_address(request, address_id):
 
 @require_POST
 def change_password(request):
-    """Change user password"""
+    """Change user password - BLOCKS OAuth users"""
     user = get_user_from_session(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    # ✅ CHECK IF OAUTH USER
+    if user.is_oauth_user():
+        return JsonResponse({
+            'error': 'Cannot change password for Google login accounts'
+        }, status=400)
     
     current_password = request.POST.get('current_password')
     new_password = request.POST.get('new_password')
@@ -1404,7 +1468,6 @@ def forgot_password(request):
     return render(request, 'account/forgot_password.html')
 
 
-
 def reset_password(request, token):
     """Reset password with token"""
     reset_token = get_object_or_404(PasswordResetToken, token=token)
@@ -1431,52 +1494,600 @@ def reset_password(request, token):
     return render(request, 'account/reset_password.html', context)
 
 
-# =====================
-# AI CHAT (Placeholder)
-# =====================
+# =============================================
+# USER API - Active Orders Tracking
+# =============================================
 
-def ai_chat_view(request):
-    if not request.session.get('user_id'):
-        messages.error(request, 'Please login to access AI Chat')
-        return redirect('login')
+def get_active_orders(request):
+    """Get user's active orders for delivery tracking bar"""
+    user = get_user_from_session(request)
+    if not user:
+        return JsonResponse({'orders': []})
     
-    return render(request, 'aichat.html')
+    # Get all non-cancelled orders
+    orders = Order.objects.filter(
+        address__user=user
+    ).exclude(
+        status='X'  # Exclude cancelled
+    ).order_by('-created_at')
+    
+    orders_data = []
+    for order in orders:
+        # Calculate time ago
+        time_diff = timezone.now() - order.created_at
+        if time_diff.days > 0:
+            time_ago = f"{time_diff.days}d ago"
+        elif time_diff.seconds // 3600 > 0:
+            time_ago = f"{time_diff.seconds // 3600}h ago"
+        else:
+            time_ago = f"{time_diff.seconds // 60}m ago"
+        
+        # Get delivery proof if delivered
+        delivery_proof = None
+        delivered_at = None
+        if hasattr(order, 'delivery_proof') and order.delivery_proof:
+            # Access the actual ImageField in DeliveryProof
+            if order.delivery_proof.image:
+                delivery_proof = order.delivery_proof.image.url
+            if order.delivery_proof.uploaded_at:
+                delivered_at = order.delivery_proof.uploaded_at.strftime('%b %d, %I:%M %p')
+        
+        orders_data.append({
+            'id': str(order.id),
+            'order_number': order.order_number,
+            'status': order.status,
+            'total_items': order.get_total_items(),
+            'total': str(order.subtotal),
+            'time_ago': time_ago,
+            'delivery_proof': delivery_proof,
+            'delivered_at': delivered_at
+        })
+    
+    return JsonResponse({'orders': orders_data})
 
 
-# =====================
-# ADMIN VIEWS
-# =====================
+# =============================================
+# DRIVER DASHBOARD
+# =============================================
 
-def admin_dashboard(request):
-    """Admin dashboard"""
+def driver_dashboard(request):
+    """Driver dashboard view"""
+    user = get_user_from_session(request)
+    if not user or user.role != 'D':  # Check if driver
+        messages.error(request, 'Driver access required')
+        return redirect('home')
+    
+    return render(request, 'driver/dashboard.html')
+
+
+# =============================================
+# DRIVER API - Get Orders
+# =============================================
+
+def get_driver_orders(request):
+    """Get orders for driver (all non-cancelled) - FIXED DEFAULT"""
+    user = get_user_from_session(request)
+    if not user or user.role != 'D':
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    # ✅ FIX: Filter by status if provided, otherwise show ALL
+    status = request.GET.get('status', '')
+    
+    # ✅ CHANGED: Default shows ALL orders, not just 'C'
+    if status:
+        orders = Order.objects.filter(status=status).exclude(status='X')
+    else:
+        # Show ALL non-cancelled orders
+        orders = Order.objects.exclude(status='X')
+    
+    orders = orders.select_related('address__user').order_by('-created_at')
+    
+    # ✅ DEBUG: Print what we're querying
+    print(f"🚗 Driver querying orders with status: '{status}' (empty = ALL)")
+    print(f"📦 Found {orders.count()} orders")
+    
+    orders_data = []
+    for order in orders:
+        # Calculate time ago
+        time_diff = timezone.now() - order.created_at
+        if time_diff.days > 0:
+            time_ago = f"{time_diff.days} day{'s' if time_diff.days > 1 else ''} ago"
+        elif time_diff.seconds // 3600 > 0:
+            time_ago = f"{time_diff.seconds // 3600} hour{'s' if time_diff.seconds // 3600 > 1 else ''} ago"
+        else:
+            minutes = time_diff.seconds // 60
+            time_ago = f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+        
+        # Get delivery proof
+        delivery_proof = None
+        if hasattr(order, 'delivery_proof') and order.delivery_proof:
+            delivery_proof = order.delivery_proof.image.url if order.delivery_proof.image else None
+        
+        orders_data.append({
+            'id': str(order.id),
+            'order_number': order.order_number,
+            'status': order.status,
+            'customer_name': order.address.user.name,
+            'customer_phone': order.address.user.phone,
+            'delivery_address': order.address.get_full_address(),
+            'total_items': order.get_total_items(),
+            'total': str(order.subtotal),
+            'time_ago': time_ago,
+            'delivery_proof': delivery_proof
+        })
+    
+    print(f"✅ Returning {len(orders_data)} orders to driver")
+    return JsonResponse({'orders': orders_data})
+
+
+# =============================================
+# DRIVER API - Update Order Status
+# =============================================
+
+@require_POST
+def update_order_status(request):
+    """Driver updates order status"""
+    user = get_user_from_session(request)
+    if not user or user.role != 'D':
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        new_status = data.get('status')
+        
+        order = Order.objects.get(id=order_id)
+        old_status = order.status
+        
+        # Update status
+        order.status = new_status
+        order.save()
+        
+        # Send notification email to customer
+        send_order_status_email(order, old_status)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Status updated successfully'
+        })
+        
+    except Order.DoesNotExist:
+        return JsonResponse({'error': 'Order not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# =============================================
+# DRIVER API - Upload Delivery Proof
+# =============================================
+
+@require_POST
+def upload_delivery_proof(request):
+    """Driver uploads delivery proof image"""
+    user = get_user_from_session(request)
+    if not user or user.role != 'D':
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    try:
+        order_id = request.POST.get('order_id')
+        proof_image = request.FILES.get('proof_image')
+        
+        if not proof_image:
+            return JsonResponse({'error': 'No image provided'}, status=400)
+        
+        order = Order.objects.get(id=order_id)
+        
+        # Create or update delivery proof
+        from .models import DeliveryProof
+        
+        proof, created = DeliveryProof.objects.get_or_create(
+            order=order,
+            defaults={
+                'driver': user,
+                'image': proof_image,
+                'uploaded_at': timezone.now()
+            }
+        )
+        
+        if not created:
+            # Update existing proof
+            proof.image = proof_image
+            proof.uploaded_at = timezone.now()
+            proof.save()
+        
+        # Auto-set order to delivered if not already
+        if order.status != 'D':
+            order.status = 'D'
+            order.save()
+            
+            # Send notification
+            send_order_status_email(order, 'S')  # From Shipped to Delivered
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Proof uploaded successfully',
+            'image_url': proof.image.url
+        })
+        
+    except Order.DoesNotExist:
+        return JsonResponse({'error': 'Order not found'}, status=404)
+    except Exception as e:
+        print(f"Upload error: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# =============================================
+# HELPER FUNCTION - Send Status Update Email
+# =============================================
+
+def send_order_status_email(order, old_status):
+    """Send email when order status changes"""
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    status_messages = {
+        'P': 'Your order is pending confirmation.',
+        'C': 'Your order has been confirmed and is being prepared!',
+        'S': 'Your order has been shipped and is on the way!',
+        'D': 'Your order has been delivered. Enjoy your chocolates!',
+        'X': 'Your order has been cancelled.'
+    }
+    
+    subject = f'Order Status Update - #{order.order_number}'
+    
+    message = f"""
+    Hi {order.address.user.name},
+
+    Your order #{order.order_number} status has been updated.
+
+    Previous Status: {dict(Order.status_choices).get(old_status)}
+    New Status: {order.get_status_display()}
+
+    {status_messages.get(order.status, '')}
+
+    Order Details:
+    Total: RM {order.subtotal}
+    Items: {order.get_total_items()}
+
+    Delivery Address:
+    {order.address.get_full_address()}
+
+    Track your order: {settings.SITE_URL}/orders/{order.id}/
+
+    Thank you for shopping with WinnieCho!
+
+    Best regards,
+    WinnieChO Team
+    """
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[order.address.user.email],
+            fail_silently=True,
+        )
+        print(f"✅ Status email sent to {order.address.user.email}")
+    except Exception as e:
+        print(f"❌ Error sending status email: {str(e)}")
+
+
+
+# =============================================
+# ANALYTICS DASHBOARD (ADD TO views.py)
+# =============================================
+
+def analytics_dashboard(request):
+    """Analytics dashboard for admin - View only, no CRUD"""
     user = get_user_from_session(request)
     if not user or not user.is_admin():
         messages.error(request, 'Admin access required')
         return redirect('home')
     
-    # Statistics
-    total_products = Product.objects.count()
-    total_orders = Order.objects.count()
-    total_members = Member.objects.count()
-    total_revenue = Payment.objects.filter(status='S').aggregate(
-        total=Sum('total_amount')
-    )['total'] or 0
+    # Time period filter
+    period = request.GET.get('period', '30')
     
-    # Recent orders
-    recent_orders = Order.objects.order_by('-created_at')[:10]
+    if period == '7':
+        start_date = timezone.now() - timedelta(days=7)
+        period_label = 'Last 7 Days'
+    elif period == '30':
+        start_date = timezone.now() - timedelta(days=30)
+        period_label = 'Last 30 Days'
+    elif period == '90':
+        start_date = timezone.now() - timedelta(days=90)
+        period_label = 'Last 90 Days'
+    else:
+        start_date = timezone.now() - timedelta(days=365)
+        period_label = 'Last Year'
     
-    # Low stock products
-    low_stock = Product.objects.filter(stock__lte=10, status=1)
+    # =====================
+    # KEY METRICS
+    # =====================
+    total_revenue = Payment.objects.filter(
+        status='S',
+        created_at__gte=start_date
+    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    
+    total_orders = Order.objects.filter(
+        created_at__gte=start_date
+    ).exclude(status='X').count()
+    
+    total_customers = User.objects.filter(
+        role='M',
+        created_at__gte=start_date
+    ).count()
+    
+    total_products = Product.objects.filter(status=1).count()
+    
+    avg_order_value = Payment.objects.filter(
+        status='S',
+        created_at__gte=start_date
+    ).aggregate(avg=Avg('total_amount'))['avg'] or 0
+    
+    # =====================
+    # SALES CHART DATA (Daily)
+    # =====================
+    sales_by_day = Payment.objects.filter(
+        status='S',
+        created_at__gte=start_date
+    ).annotate(
+        date=TruncDate('created_at')
+    ).values('date').annotate(
+        revenue=Sum('total_amount'),
+        orders=Count('id')
+    ).order_by('date')
+    
+    sales_chart_labels = [
+        item['date'].strftime('%Y-%m-%d')
+        for item in sales_by_day
+        if item['date'] is not None
+    ]
+    sales_chart_revenue = [
+        float(item['revenue'])
+        for item in sales_by_day
+        if item['date'] is not None
+    ]
+    sales_chart_orders = [
+        item['orders']
+        for item in sales_by_day
+        if item['date'] is not None
+    ]
+    
+    # =====================
+    # CATEGORY PERFORMANCE
+    # =====================
+    category_sales = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        order__status__in=['C', 'S', 'D']
+    ).values(
+        'product__category__name'
+    ).annotate(
+        revenue=Sum(F('quantity') * F('unit_price')),
+        quantity=Sum('quantity')
+    ).order_by('-revenue')
+    
+    category_labels = [item['product__category__name'] for item in category_sales]
+    category_revenue = [float(item['revenue']) for item in category_sales]
+    
+    # =====================
+    # TOP PRODUCTS
+    # =====================
+    top_products = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        order__status__in=['C', 'S', 'D']
+    ).values(
+        'product__name',
+        'product__id'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum(F('quantity') * F('unit_price'))
+    ).order_by('-total_revenue')[:10]
+    
+    # =====================
+    # RECENT ORDERS
+    # =====================
+    recent_orders = Order.objects.select_related(
+        'address__user'
+    ).exclude(status='X').order_by('-created_at')[:10]
+    
+    # =====================
+    # LOW STOCK ALERT
+    # =====================
+    low_stock = Product.objects.filter(
+        status=1,
+        stock__lte=10
+    ).order_by('stock')[:10]
+    
+    # =====================
+    # ORDER STATUS BREAKDOWN
+    # =====================
+    order_status_breakdown = Order.objects.filter(
+        created_at__gte=start_date
+    ).values('status').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    status_labels = [dict(Order.status_choices).get(item['status'], 'Unknown') for item in order_status_breakdown]
+    status_counts = [item['count'] for item in order_status_breakdown]
+    
+    # =====================
+    # TOP CUSTOMERS
+    # =====================
+    top_customers = Payment.objects.filter(
+        status='S',
+        created_at__gte=start_date
+    ).values(
+        'order__address__user__id',
+        'order__address__user__name',
+        'order__address__user__email'
+    ).annotate(
+        total_spent=Sum('total_amount'),
+        order_count=Count('order', distinct=True)
+    ).order_by('-total_spent')[:10]
     
     context = {
-        'total_products': total_products,
+        'total_revenue': float(total_revenue),
         'total_orders': total_orders,
-        'total_members': total_members,
-        'total_revenue': total_revenue,
+        'total_customers': total_customers,
+        'total_products': total_products,
+        'avg_order_value': float(avg_order_value),
+
+        'sales_chart_labels': sales_chart_labels,
+        'sales_chart_revenue': sales_chart_revenue,
+        'sales_chart_orders': sales_chart_orders,
+
+        'category_labels': category_labels,
+        'category_revenue': category_revenue,
+
+        'status_labels': status_labels,
+        'status_counts': status_counts,
+
+        'top_products': top_products,
         'recent_orders': recent_orders,
         'low_stock': low_stock,
+        'top_customers': top_customers,
+
+        'period': period,
+        'period_label': period_label,
     }
-    return render(request, 'account/admin_dashboard.html', context)
+    
+    return render(request, 'secure/admin/analytics.html', context)
+
+
+# ============================================================
+# EMAIL NOTIFICATION FUNCTIONS
+# ============================================================
+
+def send_admin_notification(order):
+    """Send email/SMS to admin when order placed"""
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    subject = f'🛒 New Order - #{order.order_number}'
+    payment = order.payments.first()
+    
+    message = f"""
+═══════════════════════════════════════
+NEW ORDER RECEIVED
+═══════════════════════════════════════
+
+Order Number: {order.order_number}
+Order Date: {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+
+CUSTOMER INFORMATION:
+• Name: {order.address.user.name}
+• Email: {order.address.user.email}
+• Phone: {order.address.user.phone}
+
+ORDER DETAILS:
+• Items: {order.get_total_items()} item(s)
+• Subtotal: RM {order.subtotal}
+• Discount: RM {payment.discount_amount if payment else 0}
+• Total: RM {payment.total_amount if payment else order.subtotal}
+• Payment: {payment.get_method_display() if payment else 'N/A'}
+
+DELIVERY ADDRESS:
+{order.address.label}
+{order.address.address}
+{order.address.city}, {order.address.state} {order.address.postal_code}
+{order.address.country}
+
+ITEMS ORDERED:
+"""
+    
+    for item in order.items.all():
+        message += f"\n  • {item.quantity}x {item.product_name} - RM {item.subtotal}"
+    
+    message += f"""
+
+═══════════════════════════════════════
+View in admin panel to process order.
+
+WinnieChO Admin System
+═══════════════════════════════════════
+"""
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.ADMIN_EMAIL],
+            fail_silently=False,
+        )
+        print(f"✅ Admin email sent for order {order.order_number}")
+        
+        # SNS notification (optional)
+        if hasattr(settings, 'USE_SNS_NOTIFICATIONS') and settings.USE_SNS_NOTIFICATIONS:
+            try:
+                sns = boto3.client('sns', region_name=settings.AWS_SNS_REGION_NAME)
+                sms_message = f"WinnieChO: New order #{order.order_number} from {order.address.user.name}. Total: RM {payment.total_amount if payment else order.subtotal}"
+                sns.publish(
+                    TopicArn=settings.AWS_SNS_TOPIC_ARN,
+                    Subject=subject,
+                    Message=sms_message
+                )
+                print(f"✅ Admin SMS sent for order {order.order_number}")
+            except Exception as e:
+                print(f"⚠️  SNS failed: {str(e)}")
+        
+        return True
+    except Exception as e:
+        print(f"❌ Error sending admin notification: {str(e)}")
+        return False
+
+
+def send_order_status_email(order, old_status):
+    """Send email when order status changes"""
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    subject = f'Order Status Update - #{order.order_number}'
+    
+    status_messages = {
+        'P': 'Your order is pending confirmation.',
+        'C': 'Your order has been confirmed and is being prepared!',
+        'S': 'Your order has been shipped and is on the way!',
+        'D': 'Your order has been delivered. Enjoy your chocolates!',
+        'X': 'Your order has been cancelled.'
+    }
+    
+    message = f"""
+Hi {order.address.user.name},
+
+Your order #{order.order_number} status has been updated.
+
+Previous Status: {old_status}
+New Status: {order.get_status_display()}
+
+{status_messages.get(order.status, '')}
+
+Order Details:
+Total: RM {order.subtotal}
+Items: {order.get_total_items()}
+
+Delivery Address:
+{order.address.get_full_address()}
+
+Thank you for shopping with WinnieCho!
+
+Best regards,
+WinnieChO Team
+"""
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[order.address.user.email],
+            fail_silently=False,
+        )
+        print(f"✅ Status email sent to {order.address.user.email}")
+    except Exception as e:
+        print(f"❌ Error sending status email: {str(e)}")
 
 
 def lambda_handler(event, context):

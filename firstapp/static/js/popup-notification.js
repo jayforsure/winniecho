@@ -27,5 +27,5 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
       notification.remove();
     }, 300);
-  }, 4000);
+  }, 3000);
 }

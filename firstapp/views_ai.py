@@ -84,14 +84,12 @@ KEYWORD DETECTION & RESPONSE GUIDELINES:
 
 TONE: Warm, knowledgeable, and helpful like a friendly chocolate sommelier"""
 
-@login_required
 def ai_chat_view(request):
     """Render the AI chat interface"""
     return render(request, 'aichat.html')
 
 @csrf_exempt
 @require_POST
-@login_required
 def chat_api(request):
     """Handle chat messages"""
     try:

@@ -1,212 +1,642 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}AI Chocolate Assistant - WinnieCho{% endblock %}
+{% block title %}AI Assistant - WinnieCho{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/aichat.css' %}">
+<style>
+    /* ============================================
+       AI CHAT - JAPANESE MINIMALIST (PRODUCTS STYLE)
+       ============================================ */
 
+    :root {
+        --ink: #2b2b2b;
+        --charcoal: #4a4a4a;
+        --ash: #8a8a8a;
+        --mist: #d4d4d4;
+        --paper: #fafaf8;
+        --cream: #f5f5f0;
+        --sand: #e8e6e0;
+        --gold: #b8956a;
+        --copper: #a67c52;
+        --green: #7a9479;
+        --red: #b85c5c;
+        --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --font-primary: 'Noto Sans', -apple-system, sans-serif;
+        --font-display: 'Playfair Display', serif;
+    }
+
+    /* Page Title (SAME AS PRODUCTS) */
+    .page-title-jp {
+        background: var(--paper);
+        border-bottom: 1px solid var(--sand);
+        padding: 32px 0;
+        margin-top: 84px;
+    }
+
+    .container-medium {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 0 var(--space-md);
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 60px;
+    }
+
+    .container-jp {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .title-content-jp {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .page-heading-jp {
+        font-family: var(--font-display);
+        font-size: 32px;
+        font-weight: 500;
+        color: var(--ink);
+        letter-spacing: -0.5px;
+        margin-left: 40px;
+    }
+
+    .page-breadcrumb-jp {
+        font-size: 13px;
+        color: var(--ash);
+        letter-spacing: 0.5px;
+        margin-right:23px;
+    }
+
+    /* AI Chat Section (LIKE PRODUCTS SECTION) */
+    .ai-chat-section-jp {
+        padding: 40px 0 80px;
+        min-height: 70vh;
+        background: var(--cream);
+    }
+
+    .ai-chat-container-jp {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 32px;
+    }
+
+    /* Sidebar (LIKE PRODUCTS SIDEBAR) */
+    .ai-sidebar-jp {
+        position: sticky;
+        top: 120px;
+        height: fit-content;
+    }
+
+    .sidebar-section-jp {
+        background: var(--paper);
+        border: 1px solid var(--sand);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title-jp {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--charcoal);
+        margin-bottom: 12px;
+    }
+
+    .sidebar-divider-jp {
+        width: 24px;
+        height: 1px;
+        background: var(--gold);
+        margin-bottom: 16px;
+    }
+
+    /* Prompt Buttons (LIKE NAV LINKS) */
+    .prompt-list-jp {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .prompt-btn-jp {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        text-align: left;
+        background: transparent;
+        border: 1px solid var(--sand);
+        color: var(--charcoal);
+        font-size: 13px;
+        font-family: var(--font-primary);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .prompt-btn-jp:hover {
+        background: var(--cream);
+        color: var(--ink);
+        border-color: var(--mist);
+        padding-left: 16px;
+    }
+
+    /* Chat Main Area */
+    .ai-chat-main-jp {
+        background: var(--paper);
+        border: 1px solid var(--sand);
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 220px);
+        min-height: 600px;
+    }
+
+    /* Chat Messages */
+    .chat-messages-jp {
+        flex: 1;
+        padding: 32px;
+        overflow-y: auto;
+        background: var(--cream);
+    }
+
+    .chat-messages-jp::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chat-messages-jp::-webkit-scrollbar-thumb {
+        background: var(--sand);
+    }
+
+    /* Message (LIKE PRODUCT CARDS) */
+    .message-jp {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-avatar-jp {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ai-message-jp .message-avatar-jp {
+        background: var(--ink);
+        color: var(--gold);
+    }
+
+    .user-message-jp .message-avatar-jp {
+        background: var(--copper);
+        color: var(--paper);
+    }
+
+    .message-content-jp {
+        flex: 1;
+        max-width: 75%;
+    }
+
+    .message-meta-jp {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .sender-name-jp {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ink);
+    }
+
+    .message-time-jp {
+        font-size: 11px;
+        color: var(--ash);
+    }
+
+    .message-text-jp {
+        padding: 16px 20px;
+        background: var(--paper);
+        border: 1px solid var(--sand);
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--ink);
+    }
+
+    .ai-message-jp .message-text-jp {
+        border-left: 2px solid var(--copper);
+    }
+
+    .user-message-jp .message-text-jp {
+        border-right: 2px solid var(--copper);
+    }
+
+    /* Welcome Message */
+    .welcome-message-jp h3 {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        letter-spacing: -0.2px;
+    }
+
+    .welcome-message-jp ul {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0;
+    }
+
+    .welcome-message-jp li {
+        padding: 6px 0 6px 16px;
+        font-size: 13px;
+        position: relative;
+    }
+
+    .welcome-message-jp li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--copper);
+        border-radius: 50%;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator-jp {
+        display: flex;
+        gap: 6px;
+        padding: 16px 20px;
+    }
+
+    .typing-dot-jp {
+        width: 6px;
+        height: 6px;
+        background: var(--ash);
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot-jp:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot-jp:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+        0%, 80%, 100% { opacity: 0.3; }
+        40% { opacity: 1; }
+    }
+
+    /* Chat Input (LIKE PRODUCT SEARCH) */
+    .chat-input-area-jp {
+        padding: 24px;
+        background: var(--paper);
+        border-top: 1px solid var(--sand);
+    }
+
+    .chat-form-jp {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .textarea-jp {
+        flex: 1;
+        min-height: 48px;
+        max-height: 120px;
+        padding: 12px 16px;
+        border: 1px solid var(--sand);
+        background: white;
+        font-size: 14px;
+        font-family: var(--font-primary);
+        color: var(--ink);
+        resize: none;
+        transition: var(--transition);
+    }
+
+    .textarea-jp:focus {
+        outline: none;
+        border-color: var(--copper);
+    }
+
+    .textarea-jp::placeholder {
+        color: var(--ash);
+    }
+
+    .send-btn-jp {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--copper);
+        border: 1px solid var(--copper);
+        color: white;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .send-btn-jp:hover:not(:disabled) {
+        background: var(--ink);
+        border-color: var(--ink);
+    }
+
+    .send-btn-jp:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    /* Input Footer */
+    .input-footer-jp {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--ash);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .ai-chat-container-jp {
+            grid-template-columns: 1fr;
+        }
+
+        .ai-sidebar-jp {
+            position: static;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title-jp {
+            padding: 24px 0;
+            margin-top: 72px;
+        }
+
+        .title-content-jp {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .page-heading-jp {
+            font-size: 24px;
+        }
+
+        .ai-sidebar-jp {
+            grid-template-columns: 1fr;
+        }
+
+        .ai-chat-main-jp {
+            height: calc(100vh - 180px);
+        }
+
+        .message-content-jp {
+            max-width: 85%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<section class="ai-chat-section">
-    <!-- Background Pattern -->
-    <div class="ai-pattern"></div>
-    
-    <div class="ai-chat-container">
-        <!-- Sidebar -->
-        <aside class="ai-sidebar">
-            <div class="sidebar-header">
-                <div class="ai-avatar">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
-                    </svg>
-                </div>
-                <h2>Choco AI</h2>
-                <p>Your Chocolate Expert</p>
-            </div>
-            
-            <div class="sidebar-content">
+<!-- Page Title (SAME AS PRODUCTS) -->
+<div class="page-title-jp">
+    <div class="container-medium">
+        <div class="title-content-jp">
+            <h1 class="page-heading-jp">AI Chat</h1>
+            <p class="page-breadcrumb-jp">Home /<br> Chat</p>
+        </div>
+    </div>
+</div>
+
+<!-- AI Chat Section -->
+<section class="ai-chat-section-jp">
+    <div class="container-jp">
+        <div class="ai-chat-container-jp">
+            <!-- Sidebar (LIKE PRODUCTS SIDEBAR) -->
+            <aside class="ai-sidebar-jp">
                 <!-- Suggested Prompts -->
-                <div class="prompts-section">
-                    <h3>Try asking...</h3>
-                    <div class="prompt-grid">
-                        <button class="prompt-btn" data-prompt="What's the difference between dark, milk, and white chocolate?">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="8" x2="12" y2="12"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16"/>
-                            </svg>
+                <div class="sidebar-section-jp">
+                    <h3 class="sidebar-title-jp">Try Asking</h3>
+                    <div class="sidebar-divider-jp"></div>
+                    <div class="prompt-list-jp">
+                        <button class="prompt-btn-jp" data-prompt="What's the difference between dark, milk, and white chocolate?">
                             Chocolate Types
                         </button>
-                        <button class="prompt-btn" data-prompt="Recommend a chocolate gift for Valentine's Day">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
+                        <button class="prompt-btn-jp" data-prompt="Recommend a chocolate gift for Valentine's Day">
                             Gift Ideas
                         </button>
-                        <button class="prompt-btn" data-prompt="How should I store chocolate to keep it fresh?">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9 22 9 12 15 12 15 22"/>
-                            </svg>
+                        <button class="prompt-btn-jp" data-prompt="How should I store chocolate to keep it fresh?">
                             Storage Tips
                         </button>
-                        <button class="prompt-btn" data-prompt="What are the health benefits of dark chocolate?">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
+                        <button class="prompt-btn-jp" data-prompt="What are the health benefits of dark chocolate?">
                             Health Benefits
                         </button>
                     </div>
                 </div>
-                
-                <!-- Chat History -->
-                <div class="history-section">
-                    <div class="history-header">
-                        <h3>Recent Chats</h3>
-                        <button class="clear-history" id="clearHistory">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                            Clear
-                        </button>
-                    </div>
-                    <div class="history-list" id="historyList">
-                        <!-- History will be loaded here -->
+
+                <!-- Quick Actions -->
+                <div class="sidebar-section-jp">
+                    <h3 class="sidebar-title-jp">Quick Actions</h3>
+                    <div class="sidebar-divider-jp"></div>
+                    <div class="prompt-list-jp">
+                        <button class="prompt-btn-jp" id="clearChat">Clear Chat</button>
+                        <a href="{% url 'home' %}" class="prompt-btn-jp" style="text-decoration: none;">Back to Home</a>
                     </div>
                 </div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <div class="usage-info">
-                    <div class="usage-bar">
-                        <div class="usage-fill" id="usageFill"></div>
-                    </div>
-                    <span class="usage-text">API Usage</span>
-                </div>
-                <a href="{% url 'dashboard' %}" class="back-to-dashboard">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Dashboard
-                </a>
-            </div>
-        </aside>
-        
-        <!-- Main Chat Area -->
-        <main class="ai-chat-main">
-            <div class="chat-header">
-                <div class="chat-title">
-                    <h1>Chocolate AI Assistant</h1>
-                    <p>Ask anything about chocolate, recipes, gifts, and more</p>
-                </div>
-                <div class="chat-info">
-                    <div class="status-indicator">
-                        <div class="status-dot"></div>
-                        <span>Online</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Chat Messages Container -->
-            <div class="chat-messages" id="chatMessages">
-                <!-- Welcome Message -->
-                <div class="message-wrapper ai-message welcome-message">
-                    <div class="message-avatar">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
-                        </svg>
-                    </div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="sender-name">Choco AI</span>
-                            <span class="message-time">Just now</span>
-                        </div>
-                        <div class="message-text">
-                            <h3>Hello! I'm your Chocolate AI Assistant 🍫</h3>
-                            <p>I can help you with:</p>
-                            <ul>
-                                <li>Chocolate recommendations and pairings</li>
-                                <li>Recipe ideas and cooking tips</li>
-                                <li>Gift suggestions for special occasions</li>
-                                <li>Storage and freshness advice</li>
-                                <li>Health benefits and nutritional info</li>
-                                <li>Chocolate making techniques</li>
-                            </ul>
-                            <p>What would you like to know about chocolate today?</p>
+            </aside>
+
+            <!-- Chat Main Area -->
+            <main class="ai-chat-main-jp">
+                <!-- Chat Messages -->
+                <div class="chat-messages-jp" id="chatMessages">
+                    <!-- Welcome Message -->
+                    <div class="message-jp ai-message-jp welcome-message-jp">
+                        <div class="message-avatar-jp"></div>
+                        <div class="message-content-jp">
+                            <div class="message-meta-jp">
+                                <span class="sender-name-jp">WinnieCho</span>
+                                <span class="message-time-jp">Just now</span>
+                            </div>
+                            <div class="message-text-jp">
+                                <h3>Hello! I'm your Chocolate AI Assistant</h3>
+                                <p>I can help you with:</p>
+                                <ul>
+                                    <li>Chocolate recommendations and pairings</li>
+                                    <li>Recipe ideas and cooking tips</li>
+                                    <li>Gift suggestions for special occasions</li>
+                                    <li>Storage and freshness advice</li>
+                                    <li>Health benefits and nutritional info</li>
+                                </ul>
+                                <p>What would you like to know about chocolate today?</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Chat Input Area -->
-            <div class="chat-input-area">
-                <form id="chatForm" class="chat-form">
-                    <div class="input-wrapper">
+
+                <!-- Chat Input -->
+                <div class="chat-input-area-jp">
+                    <form id="chatForm" class="chat-form-jp">
                         <textarea 
                             id="messageInput" 
+                            class="textarea-jp"
                             placeholder="Ask about chocolate, recipes, gifts..." 
                             rows="1"
                             maxlength="1000"
                         ></textarea>
-                        <div class="input-actions">
-                            <button type="submit" class="send-btn" id="sendBtn" disabled>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <line x1="22" y1="2" x2="11" y2="13"/>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="input-footer">
-                        <div class="char-count">
-                            <span id="charCount">0</span>/1000
-                        </div>
-                        <div class="input-hint">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="16" x2="12" y2="12"/>
-                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        <button type="submit" class="send-btn-jp" id="sendBtn" disabled>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                             </svg>
-                            Press <kbd>Enter</kbd> to send, <kbd>Shift + Enter</kbd> for new line
-                        </div>
+                        </button>
+                    </form>
+                    <div class="input-footer-jp">
+                        <span><span id="charCount">0</span>/1000</span>
+                        <span>Press Enter to send</span>
                     </div>
-                </form>
-            </div>
-        </main>
+                </div>
+            </main>
+        </div>
     </div>
 </section>
 
-<!-- Typing Indicator Template -->
-<template id="typingIndicator">
-    <div class="message-wrapper ai-message typing-message">
-        <div class="message-avatar">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>
-            </svg>
-        </div>
-        <div class="message-content">
-            <div class="message-header">
-                <span class="sender-name">Choco AI</span>
-            </div>
-            <div class="typing-indicator">
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script src="{% static 'js/aichat.js' %}"></script>
 <script>
-// Set Django CSRF token for API calls
 const CSRF_TOKEN = "{{ csrf_token }}";
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const chatForm = document.getElementById('chatForm');
+    const chatMessages = document.getElementById('chatMessages');
+    const charCount = document.getElementById('charCount');
+
+    // Char counter
+    messageInput.addEventListener('input', () => {
+        const count = messageInput.value.length;
+        charCount.textContent = count;
+        sendBtn.disabled = count === 0;
+    });
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Form submit
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, 'user');
+        messageInput.value = '';
+        messageInput.style.height = 'auto';
+        charCount.textContent = '0';
+        sendBtn.disabled = true;
+
+        // Show typing
+        const typingDiv = addTypingIndicator();
+
+        try {
+            const response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            typingDiv.remove();
+
+            if (data.response) {
+                addMessage(data.response, 'ai');
+            } else {
+                addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            }
+        } catch (error) {
+            typingDiv.remove();
+            addMessage('Sorry, I could not connect. Please try again.', 'ai');
+        }
+    });
+
+    // Prompt buttons
+    document.querySelectorAll('.prompt-btn-jp[data-prompt]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            messageInput.value = btn.dataset.prompt;
+            messageInput.dispatchEvent(new Event('input'));
+            messageInput.focus();
+        });
+    });
+
+    // Clear chat
+    document.getElementById('clearChat').addEventListener('click', () => {
+        const messages = chatMessages.querySelectorAll('.message-jp:not(.welcome-message-jp)');
+        messages.forEach(msg => msg.remove());
+    });
+
+    // Helper functions
+    function addMessage(text, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-jp ${type}-message-jp`;
+        
+        const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar-jp">${type === 'ai' ? '' : ''}</div>
+            <div class="message-content-jp">
+                <div class="message-meta-jp">
+                    <span class="sender-name-jp">${type === 'ai' ? 'WinnieCho' : 'You'}</span>
+                    <span class="message-time-jp">${now}</span>
+                </div>
+                <div class="message-text-jp">${text}</div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message-jp ai-message-jp';
+        typingDiv.id = 'typing';
+        typingDiv.innerHTML = `
+            <div class="message-avatar-jp"></div>
+            <div class="message-content-jp">
+                <div class="message-text-jp">
+                    <div class="typing-indicator-jp">
+                        <span class="typing-dot-jp"></span>
+                        <span class="typing-dot-jp"></span>
+                        <span class="typing-dot-jp"></span>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingDiv;
+    }
+});
 </script>
 {% endblock %}

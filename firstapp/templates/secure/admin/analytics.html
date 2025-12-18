@@ -1,0 +1,744 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - WinnieChO Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ============================================
+           JAPANESE MINIMALIST ANALYTICS
+           Matches Products Page Aesthetic
+           ============================================ */
+
+        :root {
+            --ink: #2b2b2b;
+            --charcoal: #4a4a4a;
+            --ash: #8a8a8a;
+            --mist: #d4d4d4;
+            --paper: #fafaf8;
+            --cream: #f5f5f0;
+            --sand: #e8e6e0;
+            --gold: #b8956a;
+            --copper: #a67c52;
+            --green: #7a9479;
+            --red: #b85c5c;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-primary: 'Noto Sans', -apple-system, sans-serif;
+            --font-display: 'Playfair Display', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--cream);
+            color: var(--ink);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* Page Title (SAME AS PRODUCTS PAGE) */
+        .page-title-jp {
+            background: var(--paper);
+            border-bottom: 1px solid var(--sand);
+            padding: 32px 0;
+   
+        }
+
+        .container-jp {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .title-content-jp {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-heading-jp {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions-jp {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-jp {
+            padding: 10px 20px;
+            border: 1px solid var(--sand);
+            background: transparent;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-jp:hover {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: var(--paper);
+        }
+
+        /* Analytics Section (LIKE PRODUCTS SECTION) */
+        .analytics-section-jp {
+            padding: 40px 0 80px;
+            min-height: 70vh;
+            background: var(--cream);
+        }
+
+        /* Period Filter (Minimalist) */
+        .period-filter-jp {
+            background: var(--paper);
+            padding: 20px 24px;
+            border: 1px solid var(--sand);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .period-label-jp {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--charcoal);
+        }
+
+        .select-jp {
+            padding: 10px 16px;
+            border: 1px solid var(--sand);
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 14px;
+            font-family: var(--font-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .select-jp:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* Metrics Grid (Clean Cards) */
+        .metrics-grid-jp {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card-jp {
+            background: var(--paper);
+            padding: 24px;
+            border: 1px solid var(--sand);
+            border-left: 2px solid var(--copper);
+        }
+
+        .metric-label-jp {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--ash);
+            margin-bottom: 12px;
+        }
+
+        .metric-value-jp {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+        }
+
+        /* Section Block (LIKE PRODUCTS SIDEBAR) */
+        .section-block-jp {
+            background: var(--paper);
+            border: 1px solid var(--sand);
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .section-header-jp {
+            margin-bottom: 24px;
+        }
+
+        .section-title-jp {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+        }
+
+        .section-divider-jp {
+            width: 32px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        /* Table (Clean) */
+        .table-jp {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-jp th {
+            text-align: left;
+            padding: 12px;
+            background: var(--cream);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--charcoal);
+            border-bottom: 1px solid var(--sand);
+        }
+
+        .table-jp td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--sand);
+            font-size: 14px;
+            color: var(--ink);
+        }
+
+        .table-jp tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-jp tr:hover {
+            background: var(--cream);
+        }
+
+        /* Rank Badge */
+        .rank-badge-jp {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            background: var(--ink);
+            color: var(--paper);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Status Badge (Minimal) */
+        .badge-jp {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border: 1px solid;
+        }
+
+        .badge-success { border-color: var(--green); color: var(--green); background: rgba(122, 148, 121, 0.05); }
+        .badge-warning { border-color: var(--gold); color: var(--gold); background: rgba(184, 149, 106, 0.05); }
+        .badge-danger { border-color: var(--red); color: var(--red); background: rgba(184, 92, 92, 0.05); }
+        .badge-info { border-color: var(--charcoal); color: var(--charcoal); background: rgba(74, 74, 74, 0.05); }
+
+        /* Pagination (Minimal) */
+        .pagination-jp {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--sand);
+        }
+
+        .page-btn-jp {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--sand);
+            background: transparent;
+            color: var(--charcoal);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn-jp:hover {
+            background: var(--cream);
+            border-color: var(--mist);
+        }
+
+        .page-btn-jp.active {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: var(--paper);
+        }
+
+        .page-btn-jp:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Chart Container (Clean) */
+        .chart-container-jp {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        /* Empty State */
+        .empty-state-jp {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ash);
+        }
+
+        .empty-state-jp svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* Two Column Layout */
+        .two-col-grid-jp {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 32px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .two-col-grid-jp {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-title-jp {
+                padding: 24px 0;
+                margin-top: 72px;
+            }
+
+            .title-content-jp {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .page-heading-jp {
+                font-size: 24px;
+            }
+
+            .metrics-grid-jp {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Title (SAME AS PRODUCTS) -->
+    <div class="page-title-jp">
+        <div class="container-jp">
+            <div class="title-content-jp">
+                <h1 class="page-heading-jp">Analytics</h1>
+                <div class="header-actions-jp">
+                    <span style="font-size: 13px; color: var(--ash); letter-spacing: 0.5px;">{{ period_label }}</span>
+                    <a href="/admin/" class="btn-jp">Django Admin</a>
+                    <a href="/" class="btn-jp">Back to Site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <section class="analytics-section-jp">
+        <div class="container-jp">
+            <!-- Period Filter -->
+            <div class="period-filter-jp">
+                <span class="period-label-jp">Time Period</span>
+                <form method="get" style="display: flex; gap: 12px; flex: 1;">
+                    <select name="period" class="select-jp" onchange="this.form.submit()">
+                        <option value="7" {% if period == '7' %}selected{% endif %}>Last 7 Days</option>
+                        <option value="30" {% if period == '30' %}selected{% endif %}>Last 30 Days</option>
+                        <option value="90" {% if period == '90' %}selected{% endif %}>Last 90 Days</option>
+                        <option value="365" {% if period == '365' %}selected{% endif %}>Last Year</option>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-grid-jp">
+                <div class="metric-card-jp">
+                    <div class="metric-label-jp">Total Revenue</div>
+                    <div class="metric-value-jp">RM {{ total_revenue|floatformat:2 }}</div>
+                </div>
+                <div class="metric-card-jp">
+                    <div class="metric-label-jp">Total Orders</div>
+                    <div class="metric-value-jp">{{ total_orders }}</div>
+                </div>
+                <div class="metric-card-jp">
+                    <div class="metric-label-jp">New Customers</div>
+                    <div class="metric-value-jp">{{ total_customers }}</div>
+                </div>
+                <div class="metric-card-jp">
+                    <div class="metric-label-jp">Active Products</div>
+                    <div class="metric-value-jp">{{ total_products }}</div>
+                </div>
+                <div class="metric-card-jp">
+                    <div class="metric-label-jp">Avg Order Value</div>
+                    <div class="metric-value-jp">RM {{ avg_order_value|floatformat:2 }}</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="two-col-grid-jp">
+                <!-- Revenue Chart -->
+                <div class="section-block-jp">
+                    <div class="section-header-jp">
+                        <h3 class="section-title-jp">Revenue Overview</h3>
+                        <div class="section-divider-jp"></div>
+                    </div>
+                    <div class="chart-container-jp">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Performance -->
+                <div class="section-block-jp">
+                    <div class="section-header-jp">
+                        <h3 class="section-title-jp">Category Performance</h3>
+                        <div class="section-divider-jp"></div>
+                    </div>
+                    <div class="chart-container-jp">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="section-block-jp">
+                <div class="section-header-jp">
+                    <h3 class="section-title-jp">Top Products</h3>
+                    <div class="section-divider-jp"></div>
+                </div>
+                <table class="table-jp">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Rank</th>
+                            <th>Product</th>
+                            <th style="width: 140px;">Quantity</th>
+                            <th style="width: 160px; text-align: right;">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topProductsTable">
+                        {% for product in top_products %}
+                        <tr class="product-row" data-index="{{ forloop.counter0 }}">
+                            <td><span class="rank-badge-jp">#{{ forloop.counter }}</span></td>
+                            <td>{{ product.product__name }}</td>
+                            <td>{{ product.total_quantity }} units</td>
+                            <td style="text-align: right; font-weight: 600;">RM {{ product.total_revenue|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state-jp">
+                                    <p>No product data available</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if top_products|length > 5 %}
+                <div class="pagination-jp" id="productsPagination"></div>
+                {% endif %}
+            </div>
+
+            <!-- Top Customers -->
+            <div class="section-block-jp">
+                <div class="section-header-jp">
+                    <h3 class="section-title-jp">Top Customers</h3>
+                    <div class="section-divider-jp"></div>
+                </div>
+                <table class="table-jp">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Rank</th>
+                            <th>Customer</th>
+                            <th style="width: 100px;">Orders</th>
+                            <th style="width: 160px; text-align: right;">Total Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topCustomersTable">
+                        {% for customer in top_customers %}
+                        <tr class="customer-row" data-index="{{ forloop.counter0 }}">
+                            <td><span class="rank-badge-jp">#{{ forloop.counter }}</span></td>
+                            <td>{{ customer.order__address__user__name }}</td>
+                            <td>{{ customer.order_count }}</td>
+                            <td style="text-align: right; font-weight: 600;">RM {{ customer.total_spent|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state-jp">
+                                    <p>No customer data available</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if top_customers|length > 5 %}
+                <div class="pagination-jp" id="customersPagination"></div>
+                {% endif %}
+            </div>
+
+            <!-- Two Column: Low Stock + Recent Orders -->
+            <div class="two-col-grid-jp">
+                <!-- Low Stock Alert -->
+                <div class="section-block-jp">
+                    <div class="section-header-jp">
+                        <h3 class="section-title-jp">Low Stock Alert</h3>
+                        <div class="section-divider-jp"></div>
+                    </div>
+                    <table class="table-jp">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th style="width: 100px;">Stock</th>
+                                <th style="width: 100px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in low_stock %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td><strong>{{ product.stock }}</strong> units</td>
+                                <td>
+                                    {% if product.stock == 0 %}
+                                    <span class="badge-jp badge-danger">Out</span>
+                                    {% else %}
+                                    <span class="badge-jp badge-warning">Low</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">
+                                    <div class="empty-state-jp">
+                                        <p>All products in stock</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="section-block-jp">
+                    <div class="section-header-jp">
+                        <h3 class="section-title-jp">Recent Orders</h3>
+                        <div class="section-divider-jp"></div>
+                    </div>
+                    <table class="table-jp">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th style="width: 100px;">Total</th>
+                                <th style="width: 100px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders|slice:":5" %}
+                            <tr>
+                                <td><strong>{{ order.order_number }}</strong></td>
+                                <td>RM {{ order.subtotal|floatformat:2 }}</td>
+                                <td>
+                                    {% if order.status == 'P' %}
+                                    <span class="badge-jp badge-warning">Pending</span>
+                                    {% elif order.status == 'C' %}
+                                    <span class="badge-jp badge-info">Confirmed</span>
+                                    {% elif order.status == 'D' %}
+                                    <span class="badge-jp badge-success">Delivered</span>
+                                    {% else %}
+                                    <span class="badge-jp badge-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">
+                                    <div class="empty-state-jp">
+                                        <p>No recent orders</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{ sales_chart_labels|json_script:"salesLabelsData" }}
+    {{ sales_chart_revenue|json_script:"salesRevenueData" }}
+    {{ category_labels|json_script:"categoryLabelsData" }}
+    {{ category_revenue|json_script:"categoryRevenueData" }}
+
+    <!-- Chart.js Script -->
+    <script>
+        // Parse data from Django
+        const salesLabels = JSON.parse(document.getElementById('salesLabelsData').textContent);
+        const salesRevenue = JSON.parse(document.getElementById('salesRevenueData').textContent);
+        const categoryLabels = JSON.parse(document.getElementById('categoryLabelsData').textContent);
+        const categoryRevenue = JSON.parse(document.getElementById('categoryRevenueData').textContent);
+        // Revenue Chart (Line)
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: salesRevenue,
+                    borderColor: '#a67c52',
+                    backgroundColor: 'rgba(166, 124, 82, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => 'RM ' + value.toFixed(0),
+                            font: { size: 11 }
+                        },
+                        grid: { color: '#e8e6e0' }
+                    },
+                    x: {
+                        ticks: { font: { size: 11 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Category Chart (Bar)
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: categoryRevenue,
+                    backgroundColor: '#2b2b2b',
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => 'RM ' + value.toFixed(0),
+                            font: { size: 11 }
+                        },
+                        grid: { color: '#e8e6e0' }
+                    },
+                    x: {
+                        ticks: { font: { size: 11 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Pagination Logic
+        function initPagination(tableId, paginationId, rowsPerPage = 5) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const rows = Array.from(table.querySelectorAll('tr[data-index]'));
+            if (rows.length <= rowsPerPage) return;
+
+            const paginationContainer = document.getElementById(paginationId);
+            if (!paginationContainer) return;
+
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            let currentPage = 1;
+
+            function showPage(page) {
+                rows.forEach((row, index) => {
+                    const start = (page - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+                    row.style.display = (index >= start && index < end) ? '' : 'none';
+                });
+                currentPage = page;
+                renderPagination();
+            }
+
+            function renderPagination() {
+                paginationContainer.innerHTML = `
+                    <button class="page-btn-jp" onclick="prevPage('${tableId}')" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+                    ${Array.from({length: totalPages}, (_, i) => i + 1).map(page => `
+                        <button class="page-btn-jp ${page === currentPage ? 'active' : ''}" 
+                                onclick="goToPage('${tableId}', ${page})">${page}</button>
+                    `).join('')}
+                    <button class="page-btn-jp" onclick="nextPage('${tableId}')" ${currentPage === totalPages ? 'disabled' : ''}>›</button>
+                `;
+            }
+
+            window[`goToPage_${tableId}`] = (page) => showPage(page);
+            window[`prevPage_${tableId}`] = () => { if (currentPage > 1) showPage(currentPage - 1); };
+            window[`nextPage_${tableId}`] = () => { if (currentPage < totalPages) showPage(currentPage + 1); };
+
+            window.goToPage = (id, page) => window[`goToPage_${id}`](page);
+            window.prevPage = (id) => window[`prevPage_${id}`]();
+            window.nextPage = (id) => window[`nextPage_${id}`]();
+
+            showPage(1);
+        }
+
+        // Initialize pagination
+        initPagination('topProductsTable', 'productsPagination', 5);
+        initPagination('topCustomersTable', 'customersPagination', 5);
+    </script>
+</body>
+</html>

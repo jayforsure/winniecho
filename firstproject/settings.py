@@ -1,20 +1,17 @@
 """
 Django settings for chocolate_ordering_system project.
-PRODUCTION CONFIGURATION FOR AWS DEPLOYMENT
+PRODUCTION CONFIGURATION FOR AWS DEPLOYMENT WITH S3
 """
-import pymysql
-pymysql.install_as_MySQLdb()
-
 import os
 from pathlib import Path
 import google.generativeai as genai
 from dotenv import load_dotenv
-AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
 # Load environment variables
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
 # Security
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-fallback-secret-key')
@@ -37,9 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django',  # If using OAuth
-    'firstapp',  # Your app name
-    'storages',
+    'social_django',
+    'firstapp',
+    'storages',  # ✅ For S3
 ]
 
 MIDDLEWARE = [
@@ -73,18 +70,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'firstproject.wsgi.application'
 
-# KMS Configuration
-KMS_KEY_ID = os.getenv('KMS_KEY_ID')
-
-# Use encrypted database password
-ENCRYPTED_DB_PASSWORD = os.getenv('ENCRYPTED_DB_PASSWORD')
-
-if ENCRYPTED_DB_PASSWORD:
-    from firstapp.encryption import decrypt_secret
-    DB_PASSWORD = decrypt_secret(ENCRYPTED_DB_PASSWORD)
-else:
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
-
+# Database Configuration
 USE_RDS = os.getenv('USE_RDS', 'False') == 'True'
 if not USE_RDS:
     # LOCAL DEVELOPMENT
@@ -97,9 +83,8 @@ if not USE_RDS:
             'HOST': os.getenv('DB_HOSTl'),
             'PORT': os.getenv('DB_PORTl'),
             'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
             },
-            'PASSWORD': DB_PASSWORD,
         }
     }
 else:
@@ -113,9 +98,8 @@ else:
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
             'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
             },
-            'PASSWORD': DB_PASSWORD,
         }
     }
 
@@ -133,92 +117,68 @@ TIME_ZONE = 'Asia/Kuala_Lumpur'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# =============================================
+# S3 CONFIGURATION FOR PRODUCT IMAGES
+# =============================================
 
-# S3 Configuration - NO KEYS NEEDED!
 USE_S3 = os.getenv('USE_S3', 'False') == 'True'
 
 if USE_S3:
-    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = 'us-east-1'
+    # ✅ S3 bucket for PRODUCT IMAGES (user uploads)
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'winniecho-media')
+    AWS_S3_REGION_NAME = AWS_REGION
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_QUERYSTRING_AUTH = False  # No credentials needed!
     
+    # ✅ NO ACCESS KEYS NEEDED - Uses EC2 Instance Profile (LabInstanceProfile)
+    AWS_ACCESS_KEY_ID = None
+    AWS_SECRET_ACCESS_KEY = None
     
+    # S3 Settings
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_DEFAULT_ACL = 'public-read'  # Make uploaded images public
+    AWS_QUERYSTRING_AUTH = False  # Don't add auth parameters to URLs
+    AWS_LOCATION = 'media'  # Folder in bucket for uploads
+    
+    # Use S3 for media files (product images)
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 else:
+    # Local storage for development
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# =============================================
+# STATIC FILES (CSS/JS/Images in templates)
+# =============================================
+# Keep static files local (served by whitenoise)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-# Login URLs
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+# Whitenoise for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# SNS email
-AWS_SNS_REGION_NAME = 'us-east-1'
-AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:049585066686:winniecho-alerts'
-
-# Email settings (if using)
-if not DEBUG:
-    EMAIL_BACKEND = 'firstapp.email_backends.SNSEmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
-# Security settings for production
-if not DEBUG:
-    SECURE_SSL_REDIRECT = False  # Set True if using HTTPS
-    SESSION_COOKIE_SECURE = False  # Set True if using HTTPS
-    CSRF_COOKIE_SECURE = False  # Set True if using HTTPS
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    
-    # Proxy
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# =====================
-# AUTHENTICATION BACKENDS
-# =====================
+# =============================================
+# AUTHENTICATION
+# =============================================
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# =====================
-# SOCIAL AUTH (GOOGLE OAUTH)
-# =====================
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv(
-    'GOOGLE_OAUTH2_KEY',
-)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
-    'GOOGLE_OAUTH2_SECRET',
-)
-
+# Google OAuth
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ]
-
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
-
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard/'
 SOCIAL_AUTH_LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
@@ -232,34 +192,56 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
+    'firstapp.pipeline.create_user_profile',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
-    'firstapp.pipeline.create_user_profile',
 )
 
-# =====================
+# =============================================
 # PAYMENT GATEWAYS
-# =====================
+# =============================================
 
 # PayPal
 PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
-PAYPAL_CLIENT_ID = os.getenv(
-    'PAYPAL_CLIENT_ID'
-)
-PAYPAL_CLIENT_SECRET = os.getenv(
-    'PAYPAL_CLIENT_SECRET'
-)
+PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
 
 # Stripe
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
-# Gemini AI Configuration
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+# =============================================
+# EMAIL & NOTIFICATIONS
+# =============================================
 
-# Configure Gemini AI
+ADMIN_EMAIL = 'winniechoofficial@gmail.com'
+USE_SNS_NOTIFICATIONS = True
+
+# Site URL (for links in emails)
+SITE_URL = 'http://winniecho-alb-1199297198.us-east-1.elb.amazonaws.com'
+
+# SNS Configuration
+AWS_SNS_REGION_NAME = AWS_REGION
+AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:049585066686:winniecho-alerts'
+
+# Email Backend
+if not DEBUG:
+    EMAIL_BACKEND = 'firstapp.email_backends.SNSEmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+# =============================================
+# GEMINI AI
+# =============================================
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 if GEMINI_API_KEY:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
@@ -270,9 +252,25 @@ if GEMINI_API_KEY:
 else:
     GEMINI_AVAILABLE = False
 
-# =====================
+# =============================================
+# SECURITY SETTINGS
+# =============================================
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# =============================================
 # LOGGING
-# =====================
+# =============================================
 
 LOGGING = {
     'version': 1,
@@ -305,8 +303,5 @@ LOGGING = {
     },
 }
 
-# =====================
-# DEFAULT AUTO FIELD
-# =====================
-
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

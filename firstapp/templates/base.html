@@ -31,9 +31,20 @@
             <div class="nav-menu-jp">
                 <a href="{% url 'home' %}" class="nav-link-jp">Home</a>
                 <a href="{% url 'products' %}" class="nav-link-jp">Collection</a>
+                <a href="{% url 'ai_chat' %}" class="nav-link-jp">Chat</a>
+
                 {% if request.session.user_id %}
-                    <a href="{% url 'dashboard' %}" class="nav-link-jp">Dashboard</a>
-                    <a href="{% url 'ai_chat' %}" class="nav-link-jp">AI Chat</a>
+                    {% if request.session.user_role == 'A' %}
+                        <!-- Admin -->
+                        <a href="/admin/" class="nav-link-jp">Dashboard</a>
+                        <a href="{% url 'analytics_dashboard' %}" class="nav-link-jp">Analytics</a>
+                    {% elif request.session.user_role == 'D' %}
+                        <!-- Driver -->
+                        <a href="{% url 'driver_dashboard' %}" class="nav-link-jp">Dashboard</a>
+                    {% else %}
+                        <!-- Normal User -->
+                        <a href="{% url 'dashboard' %}" class="nav-link-jp">Dashboard</a>
+                    {% endif %}
                 {% endif %}
             </div>
             
@@ -65,11 +76,11 @@
         </div>
     </nav>
     
-    <!-- Messages (Minimalist) -->
+    <!-- Messages (Minimalist) - FIXED AUTO-DISMISS -->
     {% if messages %}
     <div class="messages-jp">
         {% for message in messages %}
-        <div class="message-jp message-{{ message.tags }}">
+        <div class="message-jp message-{{ message.tags }}" data-auto-dismiss="true">
             <div class="message-content-jp">
                 <span class="message-dot-jp"></span>
                 <span>{{ message }}</span>
@@ -84,6 +95,7 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+    
     
     <!-- Minimalist Footer -->
     <footer class="footer-jp">
@@ -141,5 +153,10 @@
     
     <!-- Page Specific Scripts -->
     {% block extra_js %}{% endblock %}
+    
+
+    {% if request.session.user_id and request.session.user_role == 'M' %}
+        {% include 'components/delivery_tracking_bar.html' %}
+    {% endif %}
 </body>
 </html>

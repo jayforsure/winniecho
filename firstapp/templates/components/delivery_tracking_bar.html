@@ -1,0 +1,942 @@
+<style>
+    /* ============================================
+       DELIVERY TRACKING BAR - Japanese Minimalist
+       ============================================ */
+
+    .delivery-bar-jp {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Noto Sans', -apple-system, sans-serif;
+        margin-right: 75%;
+    }
+
+    .delivery-bar-jp.minimized {
+        transform: translateY(calc(100% - 56px));
+    }
+
+    /* Header */
+    .delivery-header-jp {
+        background: #2b2b2b;
+        color: #fafaf8;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        border-top: 2px solid #a67c52;
+        user-select: none;
+    }
+
+    .delivery-header-jp:hover {
+        background: #3a3a3a;
+    }
+
+    .delivery-title-jp {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .delivery-badge-jp {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 8px;
+        background: #a67c52;
+        color: #fafaf8;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 12px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .delivery-toggle-jp {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid #8a8a8a;
+        color: #fafaf8;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .delivery-toggle-jp:hover {
+        border-color: #a67c52;
+        background: rgba(166, 124, 82, 0.1);
+    }
+
+    .delivery-toggle-jp svg {
+        transition: transform 0.3s ease;
+    }
+
+    .delivery-bar-jp.minimized .delivery-toggle-jp svg {
+        transform: rotate(180deg);
+    }
+
+    /* Content */
+    .delivery-content-jp {
+        background: #fafaf8;
+        max-height: 450px;
+        overflow-y: auto;
+        border-top: 1px solid #e8e6e0;
+    }
+
+    .delivery-content-jp::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .delivery-content-jp::-webkit-scrollbar-track {
+        background: #f5f5f0;
+    }
+
+    .delivery-content-jp::-webkit-scrollbar-thumb {
+        background: #d4d4d4;
+        border-radius: 3px;
+    }
+
+    .delivery-content-jp::-webkit-scrollbar-thumb:hover {
+        background: #a67c52;
+    }
+
+    /* Order Item */
+    .order-track-item-jp {
+        padding: 24px;
+        border-bottom: 1px solid #e8e6e0;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .order-track-item-jp:hover {
+        background: #f5f5f0;
+        box-shadow: inset 0 0 0 1px #e8e6e0;
+    }
+
+    .order-track-item-jp.new-order {
+        animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(166, 124, 82, 0.05);
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .order-track-item-jp.status-updated {
+        animation: highlightOrder 1.5s ease;
+    }
+
+    @keyframes highlightOrder {
+        0%, 100% { background: white; }
+        50% { background: rgba(122, 148, 121, 0.15); }
+    }
+
+    /* Order Header */
+    .order-track-header-jp {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .order-number-jp {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2b2b2b;
+        letter-spacing: 0.3px;
+    }
+
+    .order-meta-jp {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    .order-time-jp {
+        font-size: 11px;
+        color: #8a8a8a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge-jp {
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 2px;
+    }
+
+    .status-badge-jp.pending { background: #fff3e0; color: #e65100; }
+    .status-badge-jp.confirmed { background: #e3f2fd; color: #1565c0; }
+    .status-badge-jp.shipped { background: #f3e5f5; color: #6a1b9a; }
+    .status-badge-jp.delivered { background: #e8f5e9; color: #2e7d32; }
+
+    /* Progress Bar */
+    .status-progress-jp {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding: 0 12px;
+    }
+
+    .status-progress-jp::before {
+        content: '';
+        position: absolute;
+        top: 14px;
+        left: 24px;
+        right: 24px;
+        height: 3px;
+        background: #e8e6e0;
+        z-index: 0;
+    }
+
+    .status-progress-jp::after {
+        content: '';
+        position: absolute;
+        top: 14px;
+        left: 24px;
+        height: 3px;
+        background: linear-gradient(90deg, #a67c52, #b8956a);
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+    }
+
+    /* Progress widths */
+    .status-progress-jp[data-status="P"]::after { width: 0%; }
+    .status-progress-jp[data-status="C"]::after { width: calc(33.33% - 12px); }
+    .status-progress-jp[data-status="S"]::after { width: calc(66.66% - 12px); }
+    .status-progress-jp[data-status="D"]::after { width: calc(100% - 24px); }
+
+    /* Status Step */
+    .status-step-jp {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        z-index: 2;
+    }
+
+    .status-dot-jp {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #fafaf8;
+        border: 3px solid #e8e6e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .status-dot-jp svg {
+        width: 14px;
+        height: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .status-step-jp.active .status-dot-jp {
+        background: #a67c52;
+        border-color: #a67c52;
+        box-shadow: 0 0 0 6px rgba(166, 124, 82, 0.2);
+        animation: dotPulse 2s infinite;
+    }
+
+    @keyframes dotPulse {
+        0%, 100% { box-shadow: 0 0 0 6px rgba(166, 124, 82, 0.2); }
+        50% { box-shadow: 0 0 0 10px rgba(166, 124, 82, 0.1); }
+    }
+
+    .status-step-jp.active .status-dot-jp svg {
+        opacity: 1;
+        stroke: #fafaf8;
+        animation: checkFade 0.5s ease;
+    }
+
+    @keyframes checkFade {
+        from { opacity: 0; transform: scale(0); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .status-step-jp.completed .status-dot-jp {
+        background: #7a9479;
+        border-color: #7a9479;
+    }
+
+    .status-step-jp.completed .status-dot-jp svg {
+        opacity: 1;
+        stroke: #fafaf8;
+    }
+
+    /* Status Label */
+    .status-label-jp {
+        font-size: 10px;
+        font-weight: 500;
+        color: #8a8a8a;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .status-step-jp.active .status-label-jp {
+        color: #a67c52;
+        font-weight: 700;
+    }
+
+    .status-step-jp.completed .status-label-jp {
+        color: #2b2b2b;
+        font-weight: 600;
+    }
+
+    /* Order Details */
+    .order-details-jp {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+        margin-top: 16px;
+        border-top: 1px solid #e8e6e0;
+    }
+
+    .order-info-jp {
+        display: flex;
+        gap: 20px;
+        font-size: 12px;
+        color: #4a4a4a;
+    }
+
+    .order-info-item-jp {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .order-total-jp {
+        font-size: 16px;
+        font-weight: 700;
+        color: #a67c52;
+        letter-spacing: -0.3px;
+    }
+
+    /* View Details Button */
+    .view-details-btn-jp {
+        padding: 8px 18px;
+        background: transparent;
+        border: 1px solid #e8e6e0;
+        color: #4a4a4a;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .view-details-btn-jp:hover {
+        background: #2b2b2b;
+        border-color: #2b2b2b;
+        color: #fafaf8;
+    }
+
+    /* Delivery Proof */
+    .delivery-proof-jp {
+        margin-top: 16px;
+        padding: 16px;
+        background: linear-gradient(135deg, #f5f5f0, #fafaf8);
+        border: 1px solid #e8e6e0;
+        border-left: 3px solid #7a9479;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .delivery-proof-jp:hover {
+        border-color: #7a9479;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+
+    .proof-thumbnail-jp {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border: 2px solid #d4d4d4;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .delivery-proof-jp:hover .proof-thumbnail-jp {
+        border-color: #7a9479;
+    }
+
+    .proof-info-jp {
+        flex: 1;
+    }
+
+    .proof-label-jp {
+        font-size: 11px;
+        font-weight: 700;
+        color: #7a9479;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .proof-label-jp::before {
+        content: '✓';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: #7a9479;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 16px;
+        font-size: 12px;
+    }
+
+    .proof-time-jp {
+        font-size: 11px;
+        color: #8a8a8a;
+        margin-top: 4px;
+    }
+
+    /* Empty State */
+    .delivery-empty-jp {
+        padding: 60px 24px;
+        text-align: center;
+        color: #8a8a8a;
+    }
+
+    .delivery-empty-jp svg {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+        opacity: 0.2;
+        stroke: currentColor;
+    }
+
+    .delivery-empty-jp p {
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    /* Loading State */
+    .delivery-loading-jp {
+        padding: 40px 24px;
+        text-align: center;
+    }
+
+    .spinner-jp {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e8e6e0;
+        border-top-color: #a67c52;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .delivery-header-jp {
+            padding: 14px 16px;
+        }
+
+        .order-track-item-jp {
+            padding: 20px 16px;
+        }
+
+        .status-label-jp {
+            font-size: 9px;
+        }
+
+        .status-dot-jp {
+            width: 24px;
+            height: 24px;
+        }
+
+        .status-dot-jp svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .order-details-jp {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .proof-thumbnail-jp {
+            width: 60px;
+            height: 60px;
+        }
+    }
+</style>
+
+<!-- Delivery Tracking Bar HTML -->
+<div class="delivery-bar-jp minimized" id="deliveryBar" style="display: none;">
+    <div class="delivery-header-jp" onclick="toggleDeliveryBar()">
+        <div class="delivery-title-jp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="1" y="3" width="15" height="13"/>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <span>Delivery Tracking</span>
+            <span class="delivery-badge-jp" id="activeOrdersCount">0</span>
+        </div>
+        <button class="delivery-toggle-jp" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="delivery-content-jp" id="deliveryContent">
+        <div class="delivery-loading-jp">
+            <div class="spinner-jp"></div>
+            <p style="font-size: 13px; color: #8a8a8a;">Loading orders...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// PERSISTENT DELIVERY TRACKING (SIMPLIFIED)
+// ============================================
+
+let currentOrders = {};
+let pollInterval = null;
+
+// ✅ CONFIGURATION - Persistent state keys
+const STORAGE_KEYS = {
+    BAR_STATE: 'deliveryBar_isOpen',      // Open/closed state
+    BAR_VISIBLE: 'deliveryBar_isVisible'  // Show/hide based on orders
+};
+
+// ============================================
+// LOCALSTORAGE PERSISTENCE
+// ============================================
+
+// Save bar open/closed state
+function saveBarState(isOpen) {
+    try {
+        localStorage.setItem(STORAGE_KEYS.BAR_STATE, isOpen ? 'open' : 'closed');
+    } catch (e) {
+        console.warn('Failed to save bar state:', e);
+    }
+}
+
+// Load bar open/closed state
+function loadBarState() {
+    try {
+        const state = localStorage.getItem(STORAGE_KEYS.BAR_STATE);
+        return state === 'open';
+    } catch (e) {
+        return false; // Default to closed
+    }
+}
+
+// Save bar visibility (has orders or not)
+function saveBarVisibility(hasOrders) {
+    try {
+        localStorage.setItem(STORAGE_KEYS.BAR_VISIBLE, hasOrders ? 'visible' : 'hidden');
+    } catch (e) {
+        console.warn('Failed to save bar visibility:', e);
+    }
+}
+
+// Load bar visibility
+function loadBarVisibility() {
+    try {
+        const state = localStorage.getItem(STORAGE_KEYS.BAR_VISIBLE);
+        return state === 'visible';
+    } catch (e) {
+        return false; // Default to hidden
+    }
+}
+
+// ============================================
+// BAR TOGGLE WITH PERSISTENCE
+// ============================================
+
+function toggleDeliveryBar() {
+    const bar = document.getElementById('deliveryBar');
+    const isCurrentlyMinimized = bar.classList.contains('minimized');
+    
+    bar.classList.toggle('minimized');
+    
+    // Save state (inverted because we just toggled)
+    saveBarState(isCurrentlyMinimized); // If was minimized, now it's open
+}
+
+// ============================================
+// LOAD ACTIVE ORDERS (WITH PERSISTENCE)
+// ============================================
+
+async function loadActiveOrders() {
+    try {
+        const response = await fetch('/api/active-orders/');
+        const data = await response.json();
+        
+        if (data.orders && data.orders.length > 0) {
+            // Get the bar element
+            const bar = document.getElementById('deliveryBar');
+            
+            // ✅ RESTORE VISIBILITY FROM LOCALSTORAGE
+            const shouldBeVisible = loadBarVisibility();
+            bar.style.display = shouldBeVisible ? 'block' : 'none';
+            
+            // If hidden but we have orders, show it
+            if (bar.style.display === 'none' && data.orders.length > 0) {
+                bar.style.display = 'block';
+                saveBarVisibility(true);
+            }
+            
+            // ✅ RESTORE OPEN/CLOSED STATE FROM LOCALSTORAGE
+            const shouldBeOpen = loadBarState();
+            if (shouldBeOpen) {
+                bar.classList.remove('minimized');
+            } else {
+                bar.classList.add('minimized');
+            }
+            
+            // Update badge count
+            document.getElementById('activeOrdersCount').textContent = data.orders.length;
+            
+            // Check for status updates
+            const hasUpdates = checkForUpdates(data.orders);
+            
+            // Render orders
+            renderOrders(data.orders, hasUpdates);
+            
+            // Update current orders tracking
+            currentOrders = {};
+            data.orders.forEach(order => {
+                currentOrders[order.id] = order.status;
+            });
+        } else {
+            // No orders - hide bar and save state
+            renderEmptyState();
+            saveBarVisibility(false);
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+    }
+}
+
+// ============================================
+// CHECK FOR UPDATES
+// ============================================
+
+function checkForUpdates(orders) {
+    const updates = [];
+    orders.forEach(order => {
+        if (currentOrders[order.id] && currentOrders[order.id] !== order.status) {
+            updates.push(order.id);
+            
+            // Show notification for status change
+            if (window.showNotification) {
+                showNotification(`Order #${order.order_number} status updated to ${getStatusName(order.status)}`, 'success');
+            }
+        }
+    });
+    return updates;
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+
+function renderOrders(orders, updatedOrders = []) {
+    const content = document.getElementById('deliveryContent');
+    content.innerHTML = '';
+    
+    orders.forEach(order => {
+        const orderEl = createOrderElement(order);
+        
+        // Add update animation if status changed
+        if (updatedOrders.includes(order.id)) {
+            orderEl.classList.add('status-updated');
+            orderEl.classList.add('new-order');
+            
+            // Auto-open bar for important updates
+            document.getElementById('deliveryBar').classList.remove('minimized');
+            saveBarState(true); // Save as open
+        }
+        
+        content.appendChild(orderEl);
+    });
+}
+
+function getStatusName(status) {
+    const names = {
+        'P': 'Pending',
+        'C': 'Confirmed',
+        'S': 'Shipped',
+        'D': 'Delivered'
+    };
+    return names[status] || status;
+}
+
+function createOrderElement(order) {
+    const div = document.createElement('div');
+    div.className = 'order-track-item-jp';
+    div.dataset.orderId = order.id;
+    
+    const statusMap = { 'P': 0, 'C': 1, 'S': 2, 'D': 3 };
+    const currentStep = statusMap[order.status] || 0;
+    
+    const badgeClass = {
+        'P': 'pending',
+        'C': 'confirmed',
+        'S': 'shipped',
+        'D': 'delivered'
+    }[order.status] || 'pending';
+    
+    div.innerHTML = `
+        <div class="order-track-header-jp">
+            <span class="order-number-jp">#${order.order_number}</span>
+            <div class="order-meta-jp">
+                <span class="order-time-jp">${order.time_ago}</span>
+                <span class="status-badge-jp ${badgeClass}">${getStatusName(order.status)}</span>
+            </div>
+        </div>
+        
+        <div class="status-progress-jp" data-status="${order.status}">
+            ${[
+                { name: 'Pending', step: 0 },
+                { name: 'Confirmed', step: 1 },
+                { name: 'Shipped', step: 2 },
+                { name: 'Delivered', step: 3 }
+            ].map(s => {
+                let className = 'status-step-jp';
+                if (currentStep > s.step) className += ' completed';
+                else if (currentStep === s.step) className += ' active';
+                
+                return `
+                    <div class="${className}">
+                        <div class="status-dot-jp">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="status-label-jp">${s.name}</span>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+        
+        <div class="order-details-jp">
+            <div class="order-info-jp">
+                <div class="order-info-item-jp">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18"/>
+                    </svg>
+                    ${order.total_items} items
+                </div>
+            </div>
+            <span class="order-total-jp">RM ${order.total}</span>
+            <button class="view-details-btn-jp" onclick="viewOrderDetails('${order.id}')">
+                View Details
+            </button>
+        </div>
+        
+        ${order.status === 'D' && order.delivery_proof ? `
+            <div class="delivery-proof-jp" onclick="viewProofImage('${order.delivery_proof}', '${order.order_number}')">
+                <img src="${order.delivery_proof}" class="proof-thumbnail-jp" alt="Delivery Proof">
+                <div class="proof-info-jp">
+                    <div class="proof-label-jp">Delivery Confirmed</div>
+                    <div class="proof-time-jp">Delivered on ${order.delivered_at || 'Unknown'}</div>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </div>
+        ` : ''}
+    `;
+    
+    return div;
+}
+
+function renderEmptyState() {
+    const content = document.getElementById('deliveryContent');
+    content.innerHTML = `
+        <div class="delivery-empty-jp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="1" y="3" width="15" height="13"/>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <p>No active deliveries</p>
+        </div>
+    `;
+    
+    const bar = document.getElementById('deliveryBar');
+    bar.style.display = 'none';
+    saveBarVisibility(false);
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function viewOrderDetails(orderId) {
+    window.location.href = `/orders/${orderId}/`;
+}
+
+function viewProofImage(imageUrl, orderNumber) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.95);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        backdrop-filter: blur(8px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 2px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        ">
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #e8e6e0;
+            ">
+                <div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: #2b2b2b; margin: 0;">Delivery Proof</h3>
+                    <p style="font-size: 12px; color: #8a8a8a; margin: 4px 0 0;">Order #${orderNumber}</p>
+                </div>
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" style="
+                    width: 36px;
+                    height: 36px;
+                    background: #2b2b2b;
+                    border: none;
+                    color: white;
+                    font-size: 20px;
+                    cursor: pointer;
+                    border-radius: 2px;
+                ">×</button>
+            </div>
+            <img src="${imageUrl}" style="
+                max-width: 100%;
+                max-height: calc(90vh - 120px);
+                object-fit: contain;
+                border: 1px solid #e8e6e0;
+            ">
+        </div>
+    `;
+    
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
+    
+    document.body.appendChild(modal);
+}
+
+// ============================================
+// POLLING MANAGEMENT
+// ============================================
+
+function startPolling() {
+    // Initial load
+    loadActiveOrders();
+    
+    // Start interval for updates (every 15 seconds)
+    pollInterval = setInterval(loadActiveOrders, 15000);
+}
+
+function stopPolling() {
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+    }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Initializing persistent delivery tracking...');
+    
+    // Start polling
+    startPolling();
+});
+
+// Handle page visibility changes
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // Page is hidden, stop polling to save resources
+        stopPolling();
+    } else {
+        // Page is visible again, resume polling
+        startPolling();
+    }
+});
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    stopPolling();
+});
+</script>

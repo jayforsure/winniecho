@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Driver Dashboard - WinnieChO{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Japanese Minimalist Driver Dashboard */
+    :root {
+        --ink: #2b2b2b;
+        --charcoal: #4a4a4a;
+        --ash: #8a8a8a;
+        --mist: #d4d4d4;
+        --paper: #fafaf8;
+        --cream: #f5f5f0;
+        --sand: #e8e6e0;
+        --gold: #b8956a;
+        --copper: #a67c52;
+        --green: #7a9479;
+        --red: #b85c5c;
+    }
+
+    .page-title-jp {
+        background: var(--paper);
+        border-bottom: 1px solid var(--sand);
+        padding: 32px 0;
+        margin-top: 84px;
+    }
+
+    .container-jp {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .title-content-jp {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .page-heading-jp {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+    .driver-section-jp {
+        padding: 40px 0 80px;
+        background: var(--cream);
+    }
+
+    /* Tabs */
+    .tabs-jp {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 32px;
+        border-bottom: 1px solid var(--sand);
+    }
+
+    .tab-btn-jp {
+        padding: 12px 24px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--charcoal);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn-jp.active {
+        color: var(--ink);
+        border-bottom-color: var(--copper);
+    }
+
+    /* Order Cards */
+    .orders-grid-jp {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 24px;
+    }
+
+    .order-card-jp {
+        background: var(--paper);
+        border: 1px solid var(--sand);
+        padding: 24px;
+        transition: all 0.3s ease;
+    }
+
+    .order-card-jp:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+
+    .order-header-jp {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--sand);
+    }
+
+    .order-number-jp {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .order-time-jp {
+        font-size: 11px;
+        color: var(--ash);
+        text-transform: uppercase;
+    }
+
+    /* Customer Info */
+    .customer-info-jp {
+        margin-bottom: 16px;
+    }
+
+    .info-row-jp {
+        display: flex;
+        align-items: start;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .info-label-jp {
+        color: var(--ash);
+        min-width: 80px;
+    }
+
+    .info-value-jp {
+        color: var(--ink);
+        flex: 1;
+    }
+
+    /* Status Selector */
+    .status-control-jp {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--sand);
+    }
+
+    .status-select-jp {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--sand);
+        background: white;
+        font-size: 14px;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+
+    .update-btn-jp {
+        width: 100%;
+        padding: 12px;
+        background: var(--ink);
+        border: none;
+        color: var(--paper);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .update-btn-jp:hover {
+        background: var(--charcoal);
+    }
+
+    .update-btn-jp:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Proof Upload */
+    .proof-upload-jp {
+        margin-top: 16px;
+        padding: 16px;
+        background: var(--cream);
+        border: 1px dashed var(--sand);
+    }
+
+    .upload-label-jp {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--charcoal);
+        margin-bottom: 8px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .file-input-wrapper-jp {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-input-jp {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-input-label-jp {
+        display: block;
+        padding: 12px;
+        background: white;
+        border: 1px solid var(--sand);
+        text-align: center;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--charcoal);
+    }
+
+    .file-input-label-jp:hover {
+        background: var(--cream);
+    }
+
+    .preview-image-jp {
+        width: 100%;
+        margin-top: 12px;
+        border: 1px solid var(--sand);
+    }
+
+    /* Empty State */
+    .empty-state-jp {
+        grid-column: 1 / -1;
+        padding: 60px 24px;
+        text-align: center;
+        color: var(--ash);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="page-title-jp">
+    <div class="container-jp">
+        <div class="title-content-jp">
+            <h1 class="page-heading-jp">Driver Dashboard</h1>
+            <span style="font-size: 13px; color: var(--ash);">Manage Deliveries</span>
+        </div>
+    </div>
+</div>
+
+<!-- Driver Section -->
+<section class="driver-section-jp">
+    <div class="container-jp">
+        <!-- Tabs -->
+        <div class="tabs-jp">
+            <button class="tab-btn-jp active" data-status="">All Orders</button>
+            <button class="tab-btn-jp" data-status="P">Pending</button>
+            <button class="tab-btn-jp" data-status="C">Confirmed</button>
+            <button class="tab-btn-jp" data-status="S">Shipped</button>
+            <button class="tab-btn-jp" data-status="D">Delivered</button>
+        </div>
+
+        <!-- Orders Grid -->
+        <div class="orders-grid-jp" id="ordersGrid">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+</section>
+
+<script>
+let currentStatus = ''; // ✅ CHANGED: Empty string = ALL orders
+
+// Load orders
+async function loadOrders(status = '') {
+    console.log(`🚗 Driver loading orders with status: "${status}" (empty = ALL)`); // Debug
+    
+    try {
+        const url = status ? `/api/driver/orders/?status=${status}` : '/api/driver/orders/';
+        console.log(`📡 Fetching: ${url}`); // Debug
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log(`📦 Received ${data.orders?.length || 0} orders`); // Debug
+        console.log('Orders:', data.orders); // Debug
+        
+        renderOrders(data.orders);
+    } catch (error) {
+        console.error('❌ Error loading orders:', error);
+    }
+}
+
+// Render orders
+function renderOrders(orders) {
+    const grid = document.getElementById('ordersGrid');
+    
+    if (orders.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state-jp">
+                <p>No orders found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = orders.map(order => `
+        <div class="order-card-jp" data-order-id="${order.id}">
+            <div class="order-header-jp">
+                <span class="order-number-jp">#${order.order_number}</span>
+                <span class="order-time-jp">${order.time_ago}</span>
+            </div>
+            
+            <div class="customer-info-jp">
+                <div class="info-row-jp">
+                    <span class="info-label-jp">Customer:</span>
+                    <span class="info-value-jp">${order.customer_name}</span>
+                </div>
+                <div class="info-row-jp">
+                    <span class="info-label-jp">Phone:</span>
+                    <span class="info-value-jp">${order.customer_phone}</span>
+                </div>
+                <div class="info-row-jp">
+                    <span class="info-label-jp">Address:</span>
+                    <span class="info-value-jp">${order.delivery_address}</span>
+                </div>
+                <div class="info-row-jp">
+                    <span class="info-label-jp">Items:</span>
+                    <span class="info-value-jp">${order.total_items} items - RM ${order.total}</span>
+                </div>
+            </div>
+            
+            <div class="status-control-jp">
+                <select class="status-select-jp" data-order-id="${order.id}">
+                    <option value="P" ${order.status === 'P' ? 'selected' : ''}>Pending</option>
+                    <option value="C" ${order.status === 'C' ? 'selected' : ''}>Confirmed</option>
+                    <option value="S" ${order.status === 'S' ? 'selected' : ''}>Shipped</option>
+                    <option value="D" ${order.status === 'D' ? 'selected' : ''}>Delivered</option>
+                </select>
+                <button class="update-btn-jp" onclick="updateOrderStatus('${order.id}', this)">
+                    Update Status
+                </button>
+            </div>
+            
+            ${order.status === 'S' || order.status === 'D' ? `
+                <div class="proof-upload-jp">
+                    <label class="upload-label-jp">Delivery Proof Photo</label>
+                    ${order.delivery_proof ? `
+                        <img src="${order.delivery_proof}" class="preview-image-jp" alt="Delivery Proof">
+                    ` : `
+                        <div class="file-input-wrapper-jp">
+                            <input type="file" class="file-input-jp" accept="image/*" 
+                                   onchange="uploadProof('${order.id}', this)">
+                            <div class="file-input-label-jp">
+                                📷 Take/Upload Photo
+                            </div>
+                        </div>
+                        <img id="preview-${order.id}" class="preview-image-jp" style="display: none;">
+                    `}
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+// Update order status
+async function updateOrderStatus(orderId, button) {
+    const select = document.querySelector(`.status-select-jp[data-order-id="${orderId}"]`);
+    const newStatus = select.value;
+    
+    button.disabled = true;
+    button.textContent = 'Updating...';
+    
+    try {
+        const response = await fetch(`/api/driver/update-status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                status: newStatus
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Status updated successfully', 'success');
+            loadOrders(currentStatus);
+        } else {
+            showNotification(data.error || 'Failed to update', 'error');
+        }
+    } catch (error) {
+        showNotification('Error updating status', 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Update Status';
+    }
+}
+
+// Upload proof
+async function uploadProof(orderId, input) {
+    if (!input.files || !input.files[0]) return;
+    
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('proof_image', file);
+    
+    // Preview
+    const preview = document.getElementById(`preview-${orderId}`);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    
+    try {
+        const response = await fetch('/api/driver/upload-proof/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Proof uploaded successfully', 'success');
+        } else {
+            showNotification(data.error || 'Upload failed', 'error');
+        }
+    } catch (error) {
+        showNotification('Error uploading proof', 'error');
+    }
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn-jp').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn-jp').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        currentStatus = this.dataset.status;
+        loadOrders(currentStatus);
+    });
+});
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Load on page ready
+document.addEventListener('DOMContentLoaded', () => loadOrders('')); // ✅ Load ALL orders
+
+// Auto-refresh every 30 seconds
+setInterval(() => loadOrders(currentStatus), 30000);
+</script>
+{% endblock %}

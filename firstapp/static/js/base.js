@@ -1,9 +1,10 @@
 // Base JavaScript for WinnieCho Chocolate Ordering System
+// FIXED: Message auto-dismiss now works properly
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     initializeNavigation();
-    initializeMessages();
+    initializeMessages(); // ✅ This will now work
     loadCartCount();
     
     // Mobile menu toggle
@@ -36,26 +37,86 @@ function toggleMobileMenu() {
 }
 
 // =====================
-// MESSAGES
+// MESSAGES - FIXED AUTO-DISMISS
 // =====================
 
 function initializeMessages() {
-    // Auto-dismiss messages after 5 seconds
-    const messages = document.querySelectorAll('.message');
-    messages.forEach(message => {
+    // Get all Django messages
+    const messages = document.querySelectorAll('.message-jp[data-auto-dismiss="true"]');
+    
+    console.log(`Found ${messages.length} messages to auto-dismiss`); // Debug
+    
+    messages.forEach((message, index) => {
+        // Add fade-out animation after 3 seconds
         setTimeout(() => {
-            message.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => message.remove(), 300);
-        }, 5000);
+            console.log(`Dismissing message ${index + 1}`); // Debug
+            message.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => {
+                message.remove();
+                console.log(`Message ${index + 1} removed`); // Debug
+            }, 300);
+        }, 3000); // 3 seconds
     });
     
     // Close button handlers
-    const closeButtons = document.querySelectorAll('.message-close');
+    const closeButtons = document.querySelectorAll('.message-close-jp');
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
-            this.parentElement.remove();
+            const message = this.closest('.message-jp');
+            message.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => message.remove(), 300);
         });
     });
+}
+
+// ✅ UNIFIED showNotification() - Works on ALL pages
+function showNotification(message, type = 'success') {
+    // Create notification container if doesn't exist
+    let container = document.getElementById('notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.className = 'toast-container-jp';
+        document.body.appendChild(container);
+    }
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `toast toast-${type}`;
+    
+    // Icon based on type
+    const icons = {
+        success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a9479" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>`,
+        error: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b85c5c" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>`,
+        info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>`
+    };
+    
+    notification.innerHTML = `
+        ${icons[type] || icons.success}
+        <span>${message}</span>
+    `;
+    
+    // Add to container
+    container.appendChild(notification);
+    
+    // Show with animation
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 // =====================
@@ -97,62 +158,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-function showMessage(message, type = 'info') {
-    const messagesContainer = document.querySelector('.messages-container') || createMessagesContainer();
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${type}`;
-    messageDiv.innerHTML = `
-        <span>${message}</span>
-        <button class="message-close">&times;</button>
-    `;
-    
-    messagesContainer.appendChild(messageDiv);
-    
-    // Add close handler
-    messageDiv.querySelector('.message-close').addEventListener('click', function() {
-        messageDiv.remove();
-    });
-    
-    // Auto-dismiss after 5 seconds
-    setTimeout(() => {
-        messageDiv.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => messageDiv.remove(), 300);
-    }, 5000);
-}
-
-function createMessagesContainer() {
-    const container = document.createElement('div');
-    container.className = 'messages-container';
-    const main = document.querySelector('main');
-    if (main) {
-        document.body.insertBefore(container, main);
-    } else {
-        document.body.insertBefore(container, document.body.firstChild);
-    }
-    return container;
-}
-
-// Add slideOut animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// =====================
-// FORM VALIDATION
-// =====================
 
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -197,8 +202,6 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
-            // Optional: unobserve after animation
-            // observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
@@ -232,10 +235,96 @@ function hideLoading(button) {
 
 window.WinnieCho = {
     getCookie,
-    showMessage,
+    showNotification,
     updateCartCount,
     validateEmail,
     validatePhone,
     showLoading,
     hideLoading
 };
+
+// =====================
+// GLOBAL CSS FOR NOTIFICATIONS
+// =====================
+
+const style = document.createElement('style');
+style.textContent = `
+    /* Toast Container (Fixed Position) */
+    .toast-container-jp,
+    #notification-container {
+        position: fixed;
+        top: 100px;
+        right: 32px;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+    }
+
+    /* Toast Notification (Minimalist) */
+    .toast {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        background: #fafaf8;
+        border: 1px solid #e8e6e0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        font-size: 13px;
+        min-width: 320px;
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast-success {
+        border-left: 2px solid #7a9479;
+    }
+
+    .toast-error {
+        border-left: 2px solid #b85c5c;
+    }
+
+    .toast-info {
+        border-left: 2px solid #4a4a4a;
+    }
+
+    .toast svg {
+        flex-shrink: 0;
+    }
+
+    /* Slide Out Animation */
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .toast-container-jp,
+        #notification-container {
+            right: 16px;
+            left: 16px;
+            top: 80px;
+        }
+
+        .toast {
+            min-width: auto;
+            width: 100%;
+        }
+    }
+`;
+document.head.appendChild(style);
