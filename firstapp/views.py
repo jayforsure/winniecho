@@ -523,7 +523,7 @@ def process_checkout(request):
     order = Order.objects.create(
         address=user_address,
         subtotal=subtotal,
-        status='P',  # Pending
+        status='X',  # Pending
         loyalty_points_used=loyalty_points_used
     )
     
