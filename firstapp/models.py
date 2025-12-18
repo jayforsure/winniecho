@@ -334,7 +334,7 @@ class Product(models.Model):
 # -----------------------
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='img/products/')
     is_primary = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
