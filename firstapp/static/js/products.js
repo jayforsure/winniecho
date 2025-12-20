@@ -213,14 +213,30 @@ function initializeSearch() {
 // =====================
 function initializeSort() {
     const sortSelect = document.getElementById('sortSelect');
-    if (!sortSelect) return;
     
-    sortSelect.addEventListener('change', function() {
-        const sortBy = this.value;
+    if (!sortSelect) {
+        console.error('Sort select element not found!');
+        return;
+    }
+    
+    sortSelect.addEventListener('change', async function() {
+        const sortValue = this.value;
         const searchQuery = document.getElementById('searchInput')?.value || '';
         const category = document.querySelector('.nav-link-jp.active')?.dataset.category || '';
         
-        loadProducts(searchQuery, category, sortBy);
+        console.log('Sorting by:', sortValue); // Debug
+        
+        // Map frontend values to backend values
+        const sortMapping = {
+            'price_asc': 'price_low',
+            'price_desc': 'price_high',
+            'name_asc': 'name',
+            'created_desc': 'newest',
+            '': ''
+        };
+        
+        const backendSortValue = sortMapping[sortValue] || '';
+        await loadProducts(searchQuery, category, backendSortValue);
     });
 }
 
