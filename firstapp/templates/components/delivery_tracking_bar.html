@@ -511,6 +511,23 @@
             height: 60px;
         }
     }
+
+    .cancel-delivered-btn-jp {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        color: #a67c52;
+        cursor: pointer;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .cancel-delivered-btn-jp:hover {
+        color: #ff4d4f;
+    }
 </style>
 
 <!-- Delivery Tracking Bar HTML -->
@@ -543,7 +560,7 @@
 
 <script>
 // ============================================
-// PERSISTENT DELIVERY TRACKING (SIMPLIFIED)
+// PERSISTENT DELIVERY TRACKING - FIXED VERSION
 // ============================================
 
 let currentOrders = {};
@@ -551,8 +568,9 @@ let pollInterval = null;
 
 // ✅ CONFIGURATION - Persistent state keys
 const STORAGE_KEYS = {
-    BAR_STATE: 'deliveryBar_isOpen',      // Open/closed state
-    BAR_VISIBLE: 'deliveryBar_isVisible'  // Show/hide based on orders
+    BAR_STATE: 'deliveryBar_isOpen',           // Open/closed state
+    BAR_VISIBLE: 'deliveryBar_isVisible',      // Show/hide based on orders
+    DISMISSED_ORDERS: 'deliveryBar_dismissed'  // ✅ NEW: Track dismissed orders
 };
 
 // ============================================
@@ -597,6 +615,35 @@ function loadBarVisibility() {
     }
 }
 
+// ✅ NEW: Save dismissed order IDs
+function saveDismissedOrder(orderId) {
+    try {
+        const dismissed = getDismissedOrders();
+        dismissed.push(orderId);
+        localStorage.setItem(STORAGE_KEYS.DISMISSED_ORDERS, JSON.stringify(dismissed));
+        console.log('✅ Saved dismissed order:', orderId);
+    } catch (e) {
+        console.warn('Failed to save dismissed order:', e);
+    }
+}
+
+// ✅ NEW: Get all dismissed order IDs
+function getDismissedOrders() {
+    try {
+        const dismissed = localStorage.getItem(STORAGE_KEYS.DISMISSED_ORDERS);
+        return dismissed ? JSON.parse(dismissed) : [];
+    } catch (e) {
+        console.warn('Failed to load dismissed orders:', e);
+        return [];
+    }
+}
+
+// ✅ NEW: Clear old dismissed orders (older than 30 days)
+function cleanupDismissedOrders() {
+    // For now, just clear all when user logs out
+    // You can add timestamp tracking later if needed
+}
+
 // ============================================
 // BAR TOGGLE WITH PERSISTENCE
 // ============================================
@@ -621,41 +668,60 @@ async function loadActiveOrders() {
         const data = await response.json();
         
         if (data.orders && data.orders.length > 0) {
-            // Get the bar element
-            const bar = document.getElementById('deliveryBar');
-            
-            // ✅ RESTORE VISIBILITY FROM LOCALSTORAGE
-            const shouldBeVisible = loadBarVisibility();
-            bar.style.display = shouldBeVisible ? 'block' : 'none';
-            
-            // If hidden but we have orders, show it
-            if (bar.style.display === 'none' && data.orders.length > 0) {
-                bar.style.display = 'block';
-                saveBarVisibility(true);
-            }
-            
-            // ✅ RESTORE OPEN/CLOSED STATE FROM LOCALSTORAGE
-            const shouldBeOpen = loadBarState();
-            if (shouldBeOpen) {
-                bar.classList.remove('minimized');
-            } else {
-                bar.classList.add('minimized');
-            }
-            
-            // Update badge count
-            document.getElementById('activeOrdersCount').textContent = data.orders.length;
-            
-            // Check for status updates
-            const hasUpdates = checkForUpdates(data.orders);
-            
-            // Render orders
-            renderOrders(data.orders, hasUpdates);
-            
-            // Update current orders tracking
-            currentOrders = {};
-            data.orders.forEach(order => {
-                currentOrders[order.id] = order.status;
+            // ✅ FILTER OUT DISMISSED ORDERS
+            const dismissedIds = getDismissedOrders();
+            const visibleOrders = data.orders.filter(order => {
+                // Only filter out DELIVERED orders that were dismissed
+                if (order.status === 'D' && dismissedIds.includes(order.id)) {
+                    console.log(`Filtering out dismissed order: ${order.id}`);
+                    return false;
+                }
+                return true;
             });
+            
+            console.log(`Total orders: ${data.orders.length}, Visible: ${visibleOrders.length}, Dismissed: ${dismissedIds.length}`);
+            
+            if (visibleOrders.length > 0) {
+                // Get the bar element
+                const bar = document.getElementById('deliveryBar');
+                
+                // ✅ RESTORE VISIBILITY FROM LOCALSTORAGE
+                const shouldBeVisible = loadBarVisibility();
+                bar.style.display = shouldBeVisible ? 'block' : 'none';
+                
+                // If hidden but we have orders, show it
+                if (bar.style.display === 'none') {
+                    bar.style.display = 'block';
+                    saveBarVisibility(true);
+                }
+                
+                // ✅ RESTORE OPEN/CLOSED STATE FROM LOCALSTORAGE
+                const shouldBeOpen = loadBarState();
+                if (shouldBeOpen) {
+                    bar.classList.remove('minimized');
+                } else {
+                    bar.classList.add('minimized');
+                }
+                
+                // Update badge count (only visible orders)
+                document.getElementById('activeOrdersCount').textContent = visibleOrders.length;
+                
+                // Check for status updates
+                const hasUpdates = checkForUpdates(visibleOrders);
+                
+                // Render orders
+                renderOrders(visibleOrders, hasUpdates);
+                
+                // Update current orders tracking
+                currentOrders = {};
+                visibleOrders.forEach(order => {
+                    currentOrders[order.id] = order.status;
+                });
+            } else {
+                // All orders are dismissed - hide bar
+                renderEmptyState();
+                saveBarVisibility(false);
+            }
         } else {
             // No orders - hide bar and save state
             renderEmptyState();
@@ -724,6 +790,7 @@ function createOrderElement(order) {
     const div = document.createElement('div');
     div.className = 'order-track-item-jp';
     div.dataset.orderId = order.id;
+    div.style.position = 'relative'; // ✅ For absolute positioning
     
     const statusMap = { 'P': 0, 'C': 1, 'S': 2, 'D': 3 };
     const currentStep = statusMap[order.status] || 0;
@@ -735,7 +802,13 @@ function createOrderElement(order) {
         'D': 'delivered'
     }[order.status] || 'pending';
     
+    // ✅ Cancel button with event parameter
+    const cancelBtnHtml = order.status === 'D' 
+        ? `<button class="cancel-delivered-btn-jp" onclick="removeDeliveredOrder('${order.id}', event)" title="Dismiss delivered order">×</button>` 
+        : '';
+
     div.innerHTML = `
+        ${cancelBtnHtml}
         <div class="order-track-header-jp">
             <span class="order-number-jp">#${order.order_number}</span>
             <div class="order-meta-jp">
@@ -799,6 +872,41 @@ function createOrderElement(order) {
     `;
     
     return div;
+}
+
+// ✅ FIXED: Save dismissed order to localStorage
+function removeDeliveredOrder(orderId, event) {
+    // Prevent event bubbling
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    console.log(`Dismissing order: ${orderId}`);
+    
+    // ✅ SAVE TO LOCALSTORAGE FIRST
+    saveDismissedOrder(orderId);
+    
+    const orderDiv = document.querySelector(`.order-track-item-jp[data-order-id='${orderId}']`);
+    if (orderDiv) {
+        // Fade out animation
+        orderDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        orderDiv.style.opacity = '0';
+        orderDiv.style.transform = 'translateX(100px)';
+        
+        setTimeout(() => {
+            orderDiv.remove();
+            
+            // Check if there are any orders left
+            const remainingOrders = document.querySelectorAll('.order-track-item-jp');
+            if (remainingOrders.length === 0) {
+                renderEmptyState();
+            } else {
+                // Update badge count
+                document.getElementById('activeOrdersCount').textContent = remainingOrders.length;
+            }
+        }, 300);
+    }
 }
 
 function renderEmptyState() {
@@ -939,4 +1047,17 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('beforeunload', () => {
     stopPolling();
 });
+
+// ✅ BONUS: Clear dismissed orders on logout (optional)
+// Add this to your logout link click handler if you want to reset on logout
+window.clearDeliveryTracking = function() {
+    try {
+        localStorage.removeItem(STORAGE_KEYS.DISMISSED_ORDERS);
+        localStorage.removeItem(STORAGE_KEYS.BAR_STATE);
+        localStorage.removeItem(STORAGE_KEYS.BAR_VISIBLE);
+        console.log('✅ Delivery tracking cleared');
+    } catch (e) {
+        console.warn('Failed to clear delivery tracking:', e);
+    }
+};
 </script>

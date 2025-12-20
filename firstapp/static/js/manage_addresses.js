@@ -1,4 +1,4 @@
-// Manage Addresses JavaScript - Modern Version
+// Manage Addresses JavaScript - FIXED VERSION
 
 // Load address data
 let addressesData = {};
@@ -43,20 +43,37 @@ function editAddress(addressId) {
         return;
     }
     
-    // Fill form
-    document.getElementById('addressId').value = address.id;
-    document.getElementById('label').value = address.label;
-    document.getElementById('address').value = address.address;
-    document.getElementById('city').value = address.city;
-    document.getElementById('state').value = address.state;
-    document.getElementById('postal_code').value = address.postal_code;
-    document.getElementById('is_default').checked = address.is_default;
-    
-    // Update title
-    document.getElementById('modalTitle').textContent = 'Edit Address';
-    
-    // Show modal
+    // ✅ FIRST open the modal
     openAddressModal();
+    
+    // ✅ THEN fill the form (after a small delay to ensure DOM is ready)
+    setTimeout(() => {
+        // Fill form fields
+        document.getElementById('addressId').value = address.id || '';
+        document.getElementById('label').value = address.label || 'Home';
+        document.getElementById('address').value = address.address || '';
+        document.getElementById('city').value = address.city || '';
+        document.getElementById('state').value = address.state || '';
+        document.getElementById('postal_code').value = address.postal_code || '';
+        
+        // Set checkbox
+        const isDefaultCheckbox = document.getElementById('is_default');
+        if (isDefaultCheckbox) {
+            // Convert various truthy values to boolean
+            const isDefault = address.is_default;
+            const shouldBeChecked = isDefault === true || 
+                                   isDefault === 'true' || 
+                                   isDefault === 1 || 
+                                   isDefault === '1' ||
+                                   isDefault === 'on';
+            
+            isDefaultCheckbox.checked = shouldBeChecked;
+            console.log('Checkbox set to:', shouldBeChecked, 'from value:', isDefault);
+        }
+        
+        // Update title
+        document.getElementById('modalTitle').textContent = 'Edit Address';
+    }, 50); // Small delay to ensure modal DOM is ready
 }
 
 // ===================================
@@ -83,10 +100,17 @@ async function handleFormSubmit(e) {
     const formData = new FormData(this);
     const addressId = document.getElementById('addressId').value;
     
-    // Fix: Change 'true' to 'on' for checkbox
+    // ✅ FIXED: ALWAYS include is_default field
     const isDefaultCheckbox = document.getElementById('is_default');
-    if (isDefaultCheckbox && isDefaultCheckbox.checked) {
-        formData.set('is_default', 'on');
+    const isDefaultValue = isDefaultCheckbox && isDefaultCheckbox.checked ? 'on' : 'off';
+    
+    // Set the value (will override if already exists)
+    formData.set('is_default', isDefaultValue);
+    
+    // ✅ DEBUG: Log what we're sending
+    console.log('Submitting form data:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key + ': ' + value);
     }
     
     const url = addressId ? `/addresses/${addressId}/update/` : '/addresses/add/';

@@ -280,7 +280,7 @@ def login_view(request):
             
             # ✅ CHECK IF ADMIN - Redirect to admin dashboard
             if user.is_admin():
-                return redirect('/admin/', {'is_admin': request.user.is_authenticated and request.session['user_role'] == 'A'})
+                return redirect('/admin/', {'is_admin': get_logged_in_user(request).is_authenticated and request.session['user_role'] == 'A'})
             
             if user.is_driver():
                 return redirect('driver_dashboard')
@@ -302,23 +302,24 @@ def logout_view(request):
     messages.success(request, 'You have been logged out successfully')
     return redirect('home')
 
+def get_logged_in_user(request):
+    """Return the custom User instance from session"""
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return None
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return None
 
 # =====================
 # CART FUNCTIONALITY
 # =====================
 
-def get_user_from_session(request):
-    """Helper to get user from session"""
-    user_id = request.session.get('user_id')
-    if user_id:
-        return User.objects.get(pk=user_id)
-    return None
-
-
 @require_POST
 def add_to_cart(request, product_id):
     """Add product to cart"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Please login first'}, status=401)
     
@@ -365,7 +366,7 @@ def add_to_cart(request, product_id):
 
 def cart_view(request):
     """Shopping cart page"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -380,7 +381,7 @@ def cart_view(request):
 @require_POST
 def update_cart(request, item_id):
     """Update cart item quantity"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -407,7 +408,7 @@ def update_cart(request, item_id):
 @require_POST
 def remove_from_cart(request, item_id):
     """Remove item from cart"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -420,7 +421,7 @@ def remove_from_cart(request, item_id):
 @require_POST
 def clear_cart(request):
     """Clear user's cart"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -437,7 +438,7 @@ def clear_cart(request):
 
 def checkout(request):
     """Checkout page with address selection - FIXED VERSION"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -482,7 +483,7 @@ def checkout(request):
 @require_POST
 def process_checkout(request):
     """Process checkout and create order - WITH ADMIN NOTIFICATION"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -564,7 +565,7 @@ def process_checkout(request):
 
 def payment(request):
     """Payment page - shows order summary and payment methods"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
 
@@ -603,7 +604,7 @@ def payment(request):
 @require_POST
 def process_payment(request):
     """Process payment selection and create payment record"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -653,7 +654,7 @@ def process_payment(request):
         order.send_confirmation_email()
         
         # ✅ Clear the cart BEFORE redirect
-        user = get_user_from_session(request)
+        user = get_logged_in_user(request)
         if user:
             cart = Cart.objects.filter(user=user).first()
             if cart:
@@ -761,7 +762,7 @@ def paypal_success(request, payment_id):
             # Mark payment as paid (updates order status and awards loyalty points)
             payment.mark_as_paid()
             
-            user = get_user_from_session(request)
+            user = get_logged_in_user(request)
             if user:
                 cart = Cart.objects.filter(user=user).first()
                 if cart:
@@ -856,7 +857,7 @@ def stripe_success(request, payment_id):
             payment.save()
             payment.mark_as_paid()
             
-            user = get_user_from_session(request)
+            user = get_logged_in_user(request)
             if user:
                 cart = Cart.objects.filter(user=user).first()
                 if cart:
@@ -878,7 +879,7 @@ def stripe_success(request, payment_id):
                 payment.mark_as_paid()
                 
                 # ✅ Clear the cart
-                user = get_user_from_session(request)
+                user = get_logged_in_user(request)
                 if user:
                     cart = Cart.objects.filter(user=user).first()
                     if cart:
@@ -902,7 +903,7 @@ def stripe_success(request, payment_id):
             payment.mark_as_paid()
 
             # ✅ Clear the cart
-            user = get_user_from_session(request)
+            user = get_logged_in_user(request)
             if user:
                 cart = Cart.objects.filter(user=user).first()
                 if cart:
@@ -997,7 +998,7 @@ def payment_success(request, order_id):
     payment = order.payments.first()
     
     # NOW clear the cart (after successful payment)
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if user:
         cart = Cart.objects.filter(user=user).first()
         if cart:
@@ -1049,17 +1050,9 @@ def _clear_payment_session(request):
     request.session.modified = True
 
 
-def get_user_from_session(request):
-    """Helper to get user from session"""
-    user_id = request.session.get('user_id')
-    if user_id:
-        return User.objects.get(pk=user_id)
-    return None
-
-
 def order_detail(request, order_id):
     """Order detail and receipt"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -1078,7 +1071,7 @@ def order_detail(request, order_id):
 # =====================
 def dashboard(request):
     """User dashboard"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -1119,7 +1112,7 @@ def dashboard(request):
 @require_POST
 def update_profile(request):
     """Update user profile"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1137,7 +1130,7 @@ def update_profile(request):
 
 def manage_addresses(request):
     """Address management page"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -1161,7 +1154,7 @@ def manage_addresses(request):
 @require_POST
 def add_address(request):
     """Add new address"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1215,7 +1208,7 @@ def add_address(request):
 @require_POST
 def update_address(request, address_id):
     """Update existing address"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1230,12 +1223,20 @@ def update_address(request, address_id):
         address.postal_code = request.POST.get('postal_code', address.postal_code)
         address.country = request.POST.get('country', address.country)
         
-        # Handle is_default checkbox
-        is_default = request.POST.get('is_default') == 'on'
-        if is_default and not address.is_default:
-            # Unset other defaults
-            Address.objects.filter(user=user, is_default=True).update(is_default=False)
-            address.is_default = True
+        # ✅ FIXED: More explicit checkbox handling
+        is_default = request.POST.get('is_default')
+        print(f"DEBUG: is_default value from POST: {is_default}")  # Add this for debugging
+        
+        if is_default == 'on':
+            # User checked the box - make this default
+            if not address.is_default:
+                # Unset other defaults
+                Address.objects.filter(user=user, is_default=True).update(is_default=False)
+                address.is_default = True
+        elif is_default == 'off':
+            # User explicitly unchecked the box
+            address.is_default = False
+        # If is_default is not in POST at all, keep current value
         
         address.save()
         
@@ -1254,7 +1255,7 @@ def update_address(request, address_id):
 @require_POST
 def set_default_address(request, address_id):
     """Set address as default"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1284,7 +1285,7 @@ def set_default_address(request, address_id):
 @require_POST
 def delete_address(request, address_id):
     """Delete address"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1321,7 +1322,7 @@ def delete_address(request, address_id):
 @require_POST
 def change_password(request):
     """Change user password - BLOCKS OAuth users"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1348,7 +1349,7 @@ def change_password(request):
 
 def orders_history(request):
     """Order history page"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return redirect('login')
     
@@ -1500,7 +1501,7 @@ def reset_password(request, token):
 
 def get_active_orders(request):
     """Get user's active orders for delivery tracking bar"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user:
         return JsonResponse({'orders': []})
     
@@ -1552,7 +1553,7 @@ def get_active_orders(request):
 
 def driver_dashboard(request):
     """Driver dashboard view"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user or user.role != 'D':  # Check if driver
         messages.error(request, 'Driver access required')
         return redirect('home')
@@ -1566,7 +1567,17 @@ def driver_dashboard(request):
 
 def get_driver_orders(request):
     """Get orders for driver (all non-cancelled) - FIXED DEFAULT"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
+
+    # ✅ ADD DETAILED DEBUG
+    print(f"🔍 Session user_id: {request.session.get('user_id')}")
+    print(f"🔍 User object: {user}")
+    print(f"🔍 User role: {user.role if user else 'None'}")
+    
+    if not user or user.role != 'D':
+        print(f"❌ Unauthorized: user={'None' if not user else user.email}, role={user.role if user else 'N/A'}")
+        return JsonResponse({'error': 'Unauthorized', 'orders': []}, status=401)
+    
     if not user or user.role != 'D':
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1627,7 +1638,7 @@ def get_driver_orders(request):
 @require_POST
 def update_order_status(request):
     """Driver updates order status"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user or user.role != 'D':
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1665,7 +1676,7 @@ def update_order_status(request):
 @require_POST
 def upload_delivery_proof(request):
     """Driver uploads delivery proof image"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user or user.role != 'D':
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
@@ -1781,7 +1792,7 @@ def send_order_status_email(order, old_status):
 
 def analytics_dashboard(request):
     """Analytics dashboard for admin - View only, no CRUD"""
-    user = get_user_from_session(request)
+    user = get_logged_in_user(request)
     if not user or not user.is_admin():
         messages.error(request, 'Admin access required')
         return redirect('home')

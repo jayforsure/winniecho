@@ -298,6 +298,17 @@ async function loadOrders(status = '') {
 function renderOrders(orders) {
     const grid = document.getElementById('ordersGrid');
     
+    // ✅ SAFETY CHECK
+    if (!orders || !Array.isArray(orders)) {
+        console.error('Invalid orders data:', orders);
+        grid.innerHTML = `
+            <div class="empty-state-jp">
+                <p>Error loading orders</p>
+            </div>
+        `;
+        return;
+    }
+    
     if (orders.length === 0) {
         grid.innerHTML = `
             <div class="empty-state-jp">
