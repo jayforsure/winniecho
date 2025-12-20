@@ -32,6 +32,8 @@ function initializeCategories() {
             const searchQuery = document.getElementById('searchInput')?.value || '';
             const sortBy = document.getElementById('sortSelect')?.value || '';
             
+            console.log('📁 Category clicked:', category);
+            
             // Update active state
             categoryLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
@@ -200,11 +202,17 @@ function initializeSearch() {
         
         searchTimeout = setTimeout(() => {
             const query = this.value.trim();
-            const category = document.querySelector('.nav-link-jp.active')?.dataset.category || '';
+            
+            // ✅ FIXED: Correct CSS class selector
+            const activeCategoryLink = document.querySelector('.nav-link-jpp.active');
+            const category = activeCategoryLink ? activeCategoryLink.dataset.category : '';
+            
             const sort = document.getElementById('sortSelect')?.value || '';
             
+            console.log('🔍 Searching - Active category:', category, 'Query:', query);
+            
             loadProducts(query, category, sort);
-        }, 300); // 300ms debounce
+        }, 300);
     });
 }
 
@@ -222,9 +230,12 @@ function initializeSort() {
     sortSelect.addEventListener('change', async function() {
         const sortValue = this.value;
         const searchQuery = document.getElementById('searchInput')?.value || '';
-        const category = document.querySelector('.nav-link-jp.active')?.dataset.category || '';
         
-        console.log('Sorting by:', sortValue); // Debug
+        // ✅ FIXED: Correct CSS class selector (nav-link-jpp, not nav-link-jp)
+        const activeCategoryLink = document.querySelector('.nav-link-jpp.active');
+        const category = activeCategoryLink ? activeCategoryLink.dataset.category : '';
+        
+        console.log('🔀 Sorting - Active category:', category, 'Sort value:', sortValue);
         
         // Map frontend values to backend values
         const sortMapping = {
@@ -236,6 +247,14 @@ function initializeSort() {
         };
         
         const backendSortValue = sortMapping[sortValue] || '';
+        
+        // Debug log to see what's being sent
+        console.log('📤 Sending to server:', {
+            search: searchQuery,
+            category: category,
+            sort: backendSortValue
+        });
+        
         await loadProducts(searchQuery, category, backendSortValue);
     });
 }
