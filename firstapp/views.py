@@ -1838,8 +1838,12 @@ def analytics_dashboard(request):
     ).aggregate(avg=Avg('total_amount'))['avg'] or 0
     
     # =====================
-    # SALES CHART DATA (Daily)
+    # FIX: SALES CHART DATA (Daily) - ENHANCED
     # =====================
+    from django.db.models.functions import TruncDate
+    import json
+    
+    # Get sales data by day
     sales_by_day = Payment.objects.filter(
         status='S',
         created_at__gte=start_date
@@ -1850,21 +1854,56 @@ def analytics_dashboard(request):
         orders=Count('id')
     ).order_by('date')
     
-    sales_chart_labels = [
-        item['date'].strftime('%Y-%m-%d')
-        for item in sales_by_day
-        if item['date'] is not None
-    ]
-    sales_chart_revenue = [
-        float(item['revenue'])
-        for item in sales_by_day
-        if item['date'] is not None
-    ]
-    sales_chart_orders = [
-        item['orders']
-        for item in sales_by_day
-        if item['date'] is not None
-    ]
+    # Convert to dictionaries for easier processing
+    sales_dict = {item['date']: float(item['revenue'] or 0) for item in sales_by_day if item['date']}
+    
+    # Generate all dates in the period (including empty days)
+    from datetime import timedelta
+    from django.utils import timezone
+    
+    all_dates = []
+    all_revenues = []
+    
+    current_date = start_date.date()
+    end_date = timezone.now().date()
+    
+    while current_date <= end_date:
+        all_dates.append(current_date)
+        # Get revenue for this date, or 0 if no data
+        revenue = sales_dict.get(current_date, 0.0)
+        all_revenues.append(revenue)
+        current_date += timedelta(days=1)
+    
+    # Format dates for display (short format for better readability)
+    sales_chart_labels = [date.strftime('%b %d') for date in all_dates]  # Jan 01, Jan 02, etc.
+    sales_chart_revenue = all_revenues
+    
+    # =====================
+    # ENHANCED: ALTERNATIVE - WEEKLY DATA (for longer periods)
+    # =====================
+    from django.db.models.functions import TruncWeek
+    
+    if period in ['90', '365']:  # For 90 days or 1 year, use weekly data
+        sales_by_week = Payment.objects.filter(
+            status='S',
+            created_at__gte=start_date
+        ).annotate(
+            week=TruncWeek('created_at')
+        ).values('week').annotate(
+            revenue=Sum('total_amount')
+        ).order_by('week')
+        
+        weekly_dates = []
+        weekly_revenues = []
+        
+        for item in sales_by_week:
+            if item['week']:
+                weekly_dates.append(item['week'].strftime('Week %W'))
+                weekly_revenues.append(float(item['revenue'] or 0))
+        
+        if weekly_dates:  # If we have weekly data, use it instead
+            sales_chart_labels = weekly_dates
+            sales_chart_revenue = weekly_revenues
     
     # =====================
     # CATEGORY PERFORMANCE
@@ -1938,6 +1977,14 @@ def analytics_dashboard(request):
         order_count=Count('order', distinct=True)
     ).order_by('-total_spent')[:10]
     
+    # =====================
+    # DEBUG: Print data to console
+    # =====================
+    print(f"🔍 DEBUG - Period: {period_label}")
+    print(f"📊 Dates count: {len(sales_chart_labels)}")
+    print(f"💰 Revenue data sample: {sales_chart_revenue[:5] if sales_chart_revenue else 'Empty'}")
+    print(f"📅 First 5 dates: {sales_chart_labels[:5] if sales_chart_labels else 'Empty'}")
+    
     context = {
         'total_revenue': float(total_revenue),
         'total_orders': total_orders,
@@ -1947,7 +1994,7 @@ def analytics_dashboard(request):
 
         'sales_chart_labels': sales_chart_labels,
         'sales_chart_revenue': sales_chart_revenue,
-        'sales_chart_orders': sales_chart_orders,
+        'sales_chart_orders': [1] * len(sales_chart_labels),  # Placeholder for orders chart
 
         'category_labels': category_labels,
         'category_revenue': category_revenue,
@@ -1965,7 +2012,6 @@ def analytics_dashboard(request):
     }
     
     return render(request, 'secure/admin/analytics.html', context)
-
 
 # ============================================================
 # EMAIL NOTIFICATION FUNCTIONS
