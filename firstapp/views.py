@@ -274,13 +274,13 @@ def login_view(request):
             request.session['user_id'] = user.id
             request.session['user_name'] = user.name
             request.session['user_email'] = user.email
-            request.session['user_role'] = user.role  # ✅ ADD THIS
+            request.session['user_role'] = user.role
             
             messages.success(request, f'Welcome back, {user.name}!')
             
-            # ✅ CHECK IF ADMIN - Redirect to admin dashboard
+            # ✅ FIXED: Simple redirect for admin
             if user.is_admin():
-                return redirect('/admin/', {'is_admin': get_logged_in_user(request).is_authenticated and request.session['user_role'] == 'A'})
+                return redirect('/admin/')
             
             if user.is_driver():
                 return redirect('driver_dashboard')

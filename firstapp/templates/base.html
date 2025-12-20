@@ -16,8 +16,126 @@
     
     <!-- Page Specific Styles -->
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* Role-based content visibility */
+        .admin-content { display: none; }
+        .member-content { display: none; }
+        .driver-content { display: none; }
+        
+        body.user-admin .admin-content { display: block; }
+        body.user-member .member-content { display: block; }
+        body.user-driver .driver-content { display: block; }
+        
+        /* Role bar styles - same as delivery tracking bar */
+        .role-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fafaf8;
+            border: 1px solid #e8e6e0;
+            border-radius: 0;
+            padding: 16px;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        
+        .role-bar.minimized {
+            transform: translateY(calc(100% - 50px));
+        }
+        
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8e6e0;
+        }
+        
+        .role-badge {
+            padding: 4px 12px;
+            background: #2b2b2b;
+            color: white;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        
+        .admin-badge { background: #7a4a4a; }
+        .member-badge { background: #4a7a5a; }
+        .driver-badge { background: #4a5a7a; }
+        
+        .role-stats {
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: #666;
+        }
+        
+        .role-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .role-btn {
+            padding: 6px 12px;
+            background: #f0f0e8;
+            border: 1px solid #d8d6d0;
+            font-size: 12px;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .role-btn:hover {
+            background: #e8e6e0;
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        /* Cart badge styling */
+        .cart-badge-jp {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #b85c5c;
+            color: white;
+            font-size: 10px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        
+        .nav-icon-jp {
+            position: relative;
+        }
+        
+        .cart-badge-jp.show {
+            display: flex;
+        }
+    </style>
 </head>
-<body data-user-logged-in="{% if request.session.user_id %}true{% else %}false{% endif %}">
+<body data-user-logged-in="{% if request.session.user_id %}true{% else %}false{% endif %}"
+      class="{% if request.session.user_role == 'A' %}user-admin{% elif request.session.user_role == 'M' %}user-member{% elif request.session.user_role == 'D' %}user-driver{% endif %}">
+    
     <!-- Minimalist Navigation -->
     <nav class="nav-jp">
         <div class="nav-container-jp">
@@ -32,34 +150,51 @@
                 <a href="{% url 'home' %}" class="nav-link-jp">Home</a>
                 <a href="{% url 'products' %}" class="nav-link-jp">Collection</a>
                 <a href="{% url 'ai_chat' %}" class="nav-link-jp">Chat</a>
-
-                {% if request.session.user_id %}
-                    {% if request.session.user_role == 'A' %}
-                        <!-- Admin -->
-                        <a href="/admin/" class="nav-link-jp">Dashboard</a>
-                        <a href="{% url 'analytics_dashboard' %}" class="nav-link-jp">Analytics</a>
-                    {% elif request.session.user_role == 'D' %}
-                        <!-- Driver -->
-                        <a href="{% url 'driver_dashboard' %}" class="nav-link-jp">Dashboard</a>
-                    {% else %}
-                        <!-- Normal User -->
-                        <a href="{% url 'dashboard' %}" class="nav-link-jp">Dashboard</a>
-                    {% endif %}
-                {% endif %}
+                
+                <!-- Admin Links -->
+                <div class="admin-content">
+                    <a href="/admin/" class="nav-link-jp">Dashboard</a>
+                    <a href="{% url 'analytics_dashboard' %}" class="nav-link-jp">Analytics</a>
+                </div>
+                
+                <!-- Driver Links -->
+                <div class="driver-content">
+                    <a href="{% url 'driver_dashboard' %}" class="nav-link-jp">Dashboard</a>
+                </div>
+                
+                <!-- Member Links -->
+                <div class="member-content">
+                    <a href="{% url 'dashboard' %}" class="nav-link-jp">Dashboard</a>
+                </div>
             </div>
             
             <!-- Actions -->
             <div class="nav-actions-jp">
                 {% if request.session.user_id %}
-                    <a href="{% url 'cart' %}" class="nav-icon-jp">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="9" cy="21" r="1"/>
-                            <circle cx="20" cy="21" r="1"/>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                        </svg>
-                        <span class="cart-badge-jp" id="cartCount">0</span>
-                    </a>
-                    <span class="nav-user-jp">{{ request.session.user_name }}</span>
+                    <!-- Cart for members only -->
+                    <div class="member-content">
+                        <a href="{% url 'cart' %}" class="nav-icon-jp">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            <span class="cart-badge-jp" id="cartCount">0</span>
+                        </a>
+                    </div>
+                    
+                    <span class="nav-user-jp">
+                        {{ request.session.user_name }}
+                        <small class="user-role">
+                            {% if request.session.user_role == 'A' %}
+                                (Admin)
+                            {% elif request.session.user_role == 'D' %}
+                                (Driver)
+                            {% else %}
+                                (Member)
+                            {% endif %}
+                        </small>
+                    </span>
                     <a href="{% url 'logout' %}" class="nav-btn-jp logout">Logout</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="nav-btn-jp">Login</a>
@@ -76,7 +211,7 @@
         </div>
     </nav>
     
-    <!-- Messages (Minimalist) - FIXED AUTO-DISMISS -->
+    <!-- Messages (Minimalist) -->
     {% if messages %}
     <div class="messages-jp">
         {% for message in messages %}
@@ -96,6 +231,109 @@
         {% block content %}{% endblock %}
     </main>
     
+    <!-- Role-specific Bars -->
+    {% if request.session.user_id %}
+        <!-- Admin Bar -->
+        {% if request.session.user_role == 'A' %}
+        <div class="role-bar admin-bar" id="adminBar">
+            <div class="role-header">
+                <span class="role-badge admin-badge">Admin Panel</span>
+                <button class="toggle-btn" onclick="toggleRoleBar('admin')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="role-content">
+                <div class="role-stats">
+                    <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span id="adminPendingOrders">Loading...</span> pending orders
+                    </div>
+                    <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        <span id="adminTodayRevenue">RM 0.00</span> today
+                    </div>
+                    <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span id="adminLowStock">0</span> low stock items
+                    </div>
+                </div>
+                <div class="role-actions">
+                    <a href="/admin/" class="role-btn">Dashboard</a>
+                    <a href="{% url 'analytics_dashboard' %}" class="role-btn">Analytics</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Member Bar -->
+        {% if request.session.user_role == 'M' %}
+        <div class="role-bar member-bar" id="memberBar">
+            <div class="role-header">
+                <span class="role-badge member-badge">My Orders</span>
+                <button class="toggle-btn" onclick="toggleRoleBar('member')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="role-content">
+                <div class="role-stats" id="memberActiveOrders">
+                    Loading active orders...
+                </div>
+                <div class="role-actions">
+                    <a href="{% url 'orders_history' %}" class="role-btn">Order History</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Driver Bar -->
+        {% if request.session.user_role == 'D' %}
+        <div class="role-bar driver-bar" id="driverBar">
+            <div class="role-header">
+                <span class="role-badge driver-badge">Driver Panel</span>
+                <button class="toggle-btn" onclick="toggleRoleBar('driver')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="role-content">
+                <div class="role-stats">
+                    <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+                            <path d="M12 18V6"/>
+                        </svg>
+                        <span id="driverPendingDeliveries">Loading...</span> pending
+                    </div>
+                    <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                        <span id="driverTodayDeliveries">0</span> today
+                    </div>
+                </div>
+                <div class="role-actions">
+                    <a href="{% url 'driver_dashboard' %}" class="role-btn">Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
     
     <!-- Minimalist Footer -->
     <footer class="footer-jp">
@@ -116,9 +354,18 @@
                     <div class="footer-divider-jp"></div>
                     <a href="{% url 'home' %}" class="footer-link-jp">Home</a>
                     <a href="{% url 'products' %}" class="footer-link-jp">Collection</a>
-                    {% if request.session.user_id %}
+                    <a href="{% url 'ai_chat' %}" class="footer-link-jp">Chat</a>
+                    
+                    <!-- Role-specific footer links -->
+                    <div class="admin-content">
+                        <a href="{% url 'analytics_dashboard' %}" class="footer-link-jp">Analytics</a>
+                    </div>
+                    <div class="member-content">
                         <a href="{% url 'dashboard' %}" class="footer-link-jp">Dashboard</a>
-                    {% endif %}
+                    </div>
+                    <div class="driver-content">
+                        <a href="{% url 'driver_dashboard' %}" class="footer-link-jp">Dashboard</a>
+                    </div>
                 </div>
                 
                 <!-- Support Column -->
@@ -151,12 +398,174 @@
     <!-- Base Scripts -->
     <script src="{% static 'js/base.js' %}"></script>
     
+    <!-- Role-specific functionality -->
+    <script>
+        // Initialize role-based functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const userRole = document.body.classList.contains('user-admin') ? 'admin' :
+                            document.body.classList.contains('user-member') ? 'member' :
+                            document.body.classList.contains('user-driver') ? 'driver' : null;
+            
+            if (userRole) {
+                console.log(`👤 User role detected: ${userRole}`);
+                initializeRoleBar(userRole);
+            }
+            
+            // Initialize cart count
+            updateCartCountFromStorage();
+        });
+        
+        // Toggle role bar
+        function toggleRoleBar(role) {
+            const bar = document.getElementById(`${role}Bar`);
+            if (bar) {
+                bar.classList.toggle('minimized');
+            }
+        }
+        
+        // Initialize role bar based on user type
+        function initializeRoleBar(role) {
+            if (role === 'admin') {
+                loadAdminStats();
+                setInterval(loadAdminStats, 30000); // Refresh every 30 seconds
+            } else if (role === 'member') {
+                loadActiveOrders();
+                setInterval(loadActiveOrders, 60000); // Refresh every minute
+            } else if (role === 'driver') {
+                loadDriverStats();
+                setInterval(loadDriverStats, 30000); // Refresh every 30 seconds
+            }
+        }
+        
+        // Admin functions
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('/get_active_orders/');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Count pending orders
+                    const pendingOrders = data.orders ? data.orders.filter(o => o.status === 'C' || o.status === 'P').length : 0;
+                    document.getElementById('adminPendingOrders').textContent = pendingOrders;
+                    
+                    // Calculate today's revenue (mock - would need actual API)
+                    const todayRevenue = 1250.75; // This should come from API
+                    document.getElementById('adminTodayRevenue').textContent = `RM ${todayRevenue.toFixed(2)}`;
+                    
+                    // Low stock (mock)
+                    document.getElementById('adminLowStock').textContent = '3';
+                }
+            } catch (error) {
+                console.error('Error loading admin stats:', error);
+            }
+        }
+        
+        // Member functions
+        async function loadActiveOrders() {
+            try {
+                const response = await fetch('/get_active_orders/');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateMemberOrdersDisplay(data.orders || []);
+                }
+            } catch (error) {
+                console.error('Error loading active orders:', error);
+            }
+        }
+        
+        function updateMemberOrdersDisplay(orders) {
+            const container = document.getElementById('memberActiveOrders');
+            if (!container) return;
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<div style="color: #666; font-size: 13px;">No active orders</div>';
+                return;
+            }
+            
+            const activeOrders = orders.filter(o => o.status !== 'D' && o.status !== 'X');
+            
+            if (activeOrders.length === 0) {
+                container.innerHTML = '<div style="color: #666; font-size: 13px;">No active orders</div>';
+                return;
+            }
+            
+            const html = activeOrders.slice(0, 3).map(order => `
+                <div style="margin-bottom: 8px; padding: 8px; background: #f8f8f4; border-left: 2px solid #4a7a5a;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <strong>#${order.order_number}</strong>
+                        <span style="color: #666;">${order.time_ago}</span>
+                    </div>
+                    <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                        ${order.total_items} items • ${order.status}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // Driver functions
+        async function loadDriverStats() {
+            try {
+                const response = await fetch('/get_driver_orders/');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.orders && Array.isArray(data.orders)) {
+                        const pendingDeliveries = data.orders.filter(o => o.status === 'C').length;
+                        const today = new Date().toDateString();
+                        const todayDeliveries = data.orders.filter(o => {
+                            // This would need actual date from API
+                            return o.status === 'D' || o.status === 'S';
+                        }).length;
+                        
+                        document.getElementById('driverPendingDeliveries').textContent = pendingDeliveries;
+                        document.getElementById('driverTodayDeliveries').textContent = todayDeliveries;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading driver stats:', error);
+            }
+        }
+        
+        // Cart functions
+        function updateCartCountFromStorage() {
+            try {
+                const savedCart = localStorage.getItem('chocolateCart');
+                if (savedCart) {
+                    const cart = JSON.parse(savedCart);
+                    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                    updateCartCount(totalItems);
+                }
+            } catch (e) {
+                console.error('Error loading cart from storage:', e);
+            }
+        }
+        
+        function updateCartCount(count) {
+            const cartBadge = document.getElementById('cartCount');
+            if (cartBadge) {
+                cartBadge.textContent = count;
+                if (count > 0) {
+                    cartBadge.classList.add('show');
+                } else {
+                    cartBadge.classList.remove('show');
+                }
+            }
+        }
+        
+        // Global show notification function
+        window.showNotification = function(message, type = 'success') {
+            // Use existing base.js notification function
+            if (typeof WinnieCho !== 'undefined' && WinnieCho.showNotification) {
+                WinnieCho.showNotification(message, type);
+            } else {
+                console.log(`${type}: ${message}`);
+            }
+        };
+    </script>
+    
     <!-- Page Specific Scripts -->
     {% block extra_js %}{% endblock %}
-    
-
-    {% if request.session.user_id and request.session.user_role == 'M' %}
-        {% include 'components/delivery_tracking_bar.html' %}
-    {% endif %}
 </body>
 </html>
