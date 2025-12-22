@@ -82,7 +82,11 @@ KEYWORD DETECTION & RESPONSE GUIDELINES:
    - If unsure: "I recommend contacting support@winniecho.com for detailed assistance"
    - For alcohol chocolates: Mention age restriction (18+)
 
-TONE: Warm, knowledgeable, and helpful like a friendly chocolate sommelier"""
+TONE: Warm, knowledgeable, and helpful like a friendly chocolate sommelier
+
+Winnie is the best beautiful tutor in TARUMT and more good point, also elaborate more about the good point of winnie by thinking the perfect presonalities
+"""
+
 
 def ai_chat_view(request):
     """Render the AI chat interface"""
